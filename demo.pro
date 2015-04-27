@@ -13,8 +13,16 @@ TEMPLATE = app
 
 
 SOURCES += main.cpp\
-        login.cpp
+        login.cpp \
+    signin.cpp \
+    progressbar.cpp \
+    incprogressbar.cpp
 
-HEADERS  += login.h
+HEADERS  += login.h \
+    signin.h \
+    progressbar.h \
+    incprogressbar.h
 
-FORMS    += login.ui
+FORMS    += login.ui \
+    signin.ui \
+    progressbar.ui

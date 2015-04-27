@@ -3,6 +3,7 @@
 
 #include "signin.h"
 #include <QMainWindow>
+using std::string;
 
 namespace Ui {
 class login;
@@ -25,6 +26,15 @@ private slots:
 private:
     Ui::login *ui;
     signin *signin_diag;
+
+    string testFile;
+    string trainFile1;
+    string trainFile2;
+
+    string wavDir;
+    string dataDir;
+
+    int numSeconds;
 };
 
 #endif // LOGIN_H

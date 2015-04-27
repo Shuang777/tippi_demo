@@ -21,8 +21,13 @@ SOURCES += main.cpp\
 HEADERS  += login.h \
     signin.h \
     progressbar.h \
-    incprogressbar.h
+    incprogressbar.h \
+    portaudiocallback.h
 
 FORMS    += login.ui \
     signin.ui \
     progressbar.ui
+
+QMAKE_CXXFLAGS += -pthread
+
+LIBS += /home/shuang/softwares/portaudio/lib/.libs/libportaudio.so /home/shuang/softwares/libsndfile-1.0.25/src/.libs/libsndfile.so -lrt -lasound -lpthread -lm

@@ -26,11 +26,6 @@ signin::~signin()
     delete ui;
 }
 
-void signin::on_pushButton_3_clicked()
-{
-    close();
-}
-
 void signin::on_radioButtonMale_clicked()
 {
     ui->logo->setPixmap(QPixmap::fromImage(male_img));
@@ -39,4 +34,14 @@ void signin::on_radioButtonMale_clicked()
 void signin::on_radioButtonFemale_clicked()
 {
     ui->logo->setPixmap(QPixmap::fromImage(female_img));
+}
+
+void signin::on_cancelButton_clicked()
+{
+    close();
+}
+
+void signin::on_doneButton_clicked()
+{
+    close();
 }

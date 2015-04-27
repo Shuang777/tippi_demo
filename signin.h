@@ -16,11 +16,13 @@ public:
     ~signin();
 
 private slots:
-    void on_pushButton_3_clicked();
-
     void on_radioButtonMale_clicked();
 
     void on_radioButtonFemale_clicked();
+
+    void on_cancelButton_clicked();
+
+    void on_doneButton_clicked();
 
 private:
     Ui::signin *ui;

@@ -3,6 +3,7 @@
 
 #include <QDialog>
 #include <QtCore>
+using std::string;
 
 namespace Ui {
 class progressbar;
@@ -13,7 +14,7 @@ class progressbar : public QDialog
     Q_OBJECT
 
 public:
-    explicit progressbar(QWidget *parent = 0);
+    explicit progressbar(QWidget *parent, int numSeconds, string recordFileName);
     ~progressbar();
 
 protected:
@@ -24,7 +25,11 @@ private:
 
     QTimer *timer;
 
-    int num_seconds;
+    int numSeconds;
+
+    string recordFileName;
+
+    void RecordAndWrite();
 };
 
 #endif // PROGRESSBAR_H

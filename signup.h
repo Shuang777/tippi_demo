@@ -3,6 +3,7 @@
 
 #include <QDialog>
 #include "basics.h"
+#include "ivectorextraction.h"
 using std::string;
 
 namespace Ui {
@@ -14,7 +15,7 @@ class signup : public QDialog
     Q_OBJECT
 
 public:
-    explicit signup(QWidget *parent, int numSeconds, UserMap *usernameMap, string trainFile1, string trainFile2);
+    explicit signup(QWidget *parent, int numSeconds, UserMap *usernameMap, string trainFile1, string trainFile2, IvectorExtraction *ivectorExtraction);
     ~signup();
 
 private slots:
@@ -49,6 +50,7 @@ private:
     UserMap *usernameMap;
     string trainFile1;
     string trainFile2;
+    IvectorExtraction *ivectorExtraction;
 
     /// Check if the recorded wav file meets criteria (e.g. speech length)
     bool CheckRecording(string trainFile);

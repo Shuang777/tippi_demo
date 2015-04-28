@@ -4,6 +4,7 @@
 #include "signup.h"
 #include <QMainWindow>
 #include "basics.h"
+#include "ivectorextraction.h"
 using std::string;
 
 namespace Ui {
@@ -36,8 +37,25 @@ private:
     string trainFile1;
     string trainFile2;
 
-    string wavDir;
+    string trainScp;
+    string testScp;
+
+    /// Directory for all the data/file
     string dataDir;
+    /// Subdirectory for wav files
+    string wavDir;
+    /// Subdirectory for speaker files
+    string fileDir;
+
+    string modelDir;
+
+    string tmpWavDir;
+    string tmpFileDir;
+
+    /// If the models are with derived variables
+    const bool derived_in = true;
+    /// class for ivector extraction and evaluation
+    IvectorExtraction ivectorExtraction;
 
     int numSeconds;
 
@@ -48,7 +66,11 @@ private:
     /// Validate if the recorded testfile name the username
     bool Validate(string username);
 
+    /// Set the window location
     void SetCenterOfApplication();
+
+    /// scp file for kaldi interface
+    void PrepScpFile();
 };
 
 #endif // LOGIN_H

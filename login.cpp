@@ -8,11 +8,17 @@
 #include <QFileDialog>
 #include <fstream>
 #include <QDesktopWidget>
+#include <sys/stat.h>
+#include <fstream>
+
 using std::pair;
+using std::endl;
+using std::ofstream;
 
 login::login(QWidget *parent) :
     QMainWindow(parent),
-    ui(new Ui::login)
+    ui(new Ui::login),
+    ivectorExtraction(true)
 {
     ui->setupUi(this);
 
@@ -25,20 +31,51 @@ login::login(QWidget *parent) :
     QWidget::setWindowIcon(qicon);
 
     dataDir = "/home/shuang/project/tippi/final/demo/data";
-    wavDir = dataDir + "/wav";
-
     userInfoFile = dataDir + "/user_info";
-    testFile = wavDir + "/tmp/test.wav";
-    trainFile1 = wavDir + "/tmp/train1.wav";
-    trainFile2 = wavDir + "/tmp/train1.wav";
+
+    wavDir = dataDir + "/wav";
+    tmpWavDir = wavDir + "/tmp";
+
+    testFile = tmpWavDir + "/test.wav";
+    trainFile1 = tmpWavDir + "/train1.wav";
+    trainFile2 = tmpWavDir + "/train2.wav";
+
+    fileDir = dataDir + "/files";
+    tmpFileDir = fileDir + "/tmp";
+    trainScp = tmpFileDir + "/train.scp";
+    testScp = tmpFileDir + "/test.scp";
+
+    modelDir = dataDir + "/models";
+    string femaleIvecMdl = modelDir + "/female_final_derived.ie";
+    string femaleUbm = modelDir + "/female_final.ubm";
+    string maleIvecMdl = modelDir + "/male_final_derived.ie";
+    string maleUbm = modelDir + "/male_final.ubm";
+
+    ivectorExtraction.SetModels(femaleIvecMdl, femaleUbm, maleIvecMdl, maleUbm);
+
+    mkdir(tmpFileDir.c_str(), S_IRWXU | S_IRWXG | S_IROTH | S_IXOTH);
+    mkdir(tmpWavDir.c_str(), S_IRWXU | S_IRWXG | S_IROTH | S_IXOTH);
 
     numSeconds = 2;
+
+    PrepScpFile();
 
     LoadUserInfo();
 
     connect(ui->lineEdit, SIGNAL(returnPressed()),ui->loginButton,SLOT(click()));
 
     SetCenterOfApplication();
+}
+
+void login::PrepScpFile() {
+    ofstream os;
+    os.open(trainScp);
+    os << "train1" << '\t' << trainFile1 << endl;
+    os << "train2" << '\t' << trainFile2 << endl;
+    os.close();
+    os.open(testScp);
+    os << "test" << '\t' << testFile << endl;
+    os.close();
 }
 
 void login::SetCenterOfApplication()
@@ -101,7 +138,7 @@ bool login::Validate(std::string username) {
 }
 
 void login::on_signupButton_clicked() {
-    signup signup_diag(this, numSeconds, &usernameMap, trainFile1, trainFile2);
+    signup signup_diag(this, numSeconds, &usernameMap, trainFile1, trainFile2, &ivectorExtraction);
     signup_diag.setModal(true);
     this->setVisible(false);
     signup_diag.exec();

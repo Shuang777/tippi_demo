@@ -4,13 +4,14 @@
 #include <QMessageBox>
 using std::pair;
 
-signup::signup(QWidget *parent, int numSeconds, UserMap *usernameMap, string trainFile1, string trainFile2) :
+signup::signup(QWidget *parent, int numSeconds, UserMap *usernameMap, string trainFile1, string trainFile2, IvectorExtraction *ivectorExtraction) :
     QDialog(parent),
     ui(new Ui::signup),
     numSeconds(numSeconds),
     usernameMap(usernameMap),
     trainFile1(trainFile1),
-    trainFile2(trainFile2)
+    trainFile2(trainFile2),
+    ivectorExtraction(ivectorExtraction)
 {
     ui->setupUi(this);
 
@@ -34,7 +35,6 @@ signup::signup(QWidget *parent, int numSeconds, UserMap *usernameMap, string tra
     ui->checkBox->setChecked(false);
     ui->checkBox2->setChecked(false);
     ui->checkBox3->setChecked(false);
-
 
 }
 
@@ -70,6 +70,7 @@ void signup::on_doneButton_clicked()
         QMessageBox::information(this, "Info", "Please choose your gender.");
         return;
     }
+    ivectorExtraction->SetGender(gender);
 
     if (username == "") {
         QMessageBox::information(this, "Info", "Please input username.");

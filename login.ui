@@ -95,6 +95,11 @@
   <widget class="QStatusBar" name="statusBar"/>
  </widget>
  <layoutdefault spacing="6" margin="11"/>
+ <tabstops>
+  <tabstop>lineEdit</tabstop>
+  <tabstop>loginButton</tabstop>
+  <tabstop>signupButton</tabstop>
+ </tabstops>
  <resources/>
  <connections/>
 </ui>

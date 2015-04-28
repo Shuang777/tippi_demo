@@ -22,12 +22,13 @@ HEADERS  += login.h \
     signin.h \
     progressbar.h \
     incprogressbar.h \
-    portaudiocallback.h
+    portaudiocallback.h \
+    basics.h
 
 FORMS    += login.ui \
     signin.ui \
     progressbar.ui
 
-QMAKE_CXXFLAGS += -pthread
+QMAKE_CXXFLAGS += -pthread -std=c++11
 
 LIBS += /home/shuang/softwares/portaudio/lib/.libs/libportaudio.so /home/shuang/softwares/libsndfile-1.0.25/src/.libs/libsndfile.so -lrt -lasound -lpthread -lm

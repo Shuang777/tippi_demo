@@ -30,6 +30,8 @@ private:
     string recordFileName;
 
     void RecordAndWrite();
+
+    bool CheckRecord();
 };
 
 #endif // PROGRESSBAR_H

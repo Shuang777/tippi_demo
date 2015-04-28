@@ -18,8 +18,8 @@ public:
 
 private:
     IvectorExtractor extractor;
-    FullGmm fgmmMale;
-    FullGmm fgmmFemale;
+    FullGmm maleFgmm;
+    FullGmm femaleFgmm;
 
     Gender gender;
 

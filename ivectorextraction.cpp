@@ -17,7 +17,16 @@ void IvectorExtraction::SetModels(string femaleIvecMdl, string femaleUbm, string
         extractor.Read(ki.Stream(), binary_in, derived_in);
         gender = male;
     }
-
+    {
+          bool binary_read;
+          Input ki(maleUbm, &binary_read);
+          maleFgmm.Read(ki.Stream(), binary_read);
+    }
+    {
+          bool binary_read;
+          Input ki(femaleUbm, &binary_read);
+          femaleFgmm.Read(ki.Stream(), binary_read);
+    }
 }
 
 void IvectorExtraction::SetGender(Gender gender) {

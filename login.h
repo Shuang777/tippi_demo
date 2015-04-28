@@ -1,7 +1,7 @@
 #ifndef LOGIN_H
 #define LOGIN_H
 
-#include "signin.h"
+#include "signup.h"
 #include <QMainWindow>
 #include "basics.h"
 using std::string;
@@ -29,7 +29,7 @@ private slots:
 
 private:
     Ui::login *ui;
-    signin *signin_diag;
+    signup *signup_diag;
 
     string userInfoFile;
     string testFile;
@@ -45,6 +45,7 @@ private:
 
     void LoadUserInfo();
 
+    /// Validate if the recorded testfile name the username
     bool Validate(string username);
 
     void SetCenterOfApplication();

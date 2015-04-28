@@ -14,19 +14,17 @@ TEMPLATE = app
 
 SOURCES += main.cpp\
         login.cpp \
-    signin.cpp \
     progressbar.cpp \
-    incprogressbar.cpp
+    signup.cpp
 
 HEADERS  += login.h \
-    signin.h \
     progressbar.h \
-    incprogressbar.h \
     portaudiocallback.h \
-    basics.h
+    basics.h \
+    signup.h
 
 FORMS    += login.ui \
-    signin.ui \
+    signup.ui \
     progressbar.ui
 
 QMAKE_CXXFLAGS += -pthread -std=c++11

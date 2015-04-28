@@ -20,16 +20,20 @@ public:
 protected:
     void keyPressEvent(QKeyEvent *e);
 
+signals:
+    void ValueChanged(int newValue);
+
 private:
     Ui::progressbar *ui;
 
-    QTimer *timer;
+    QFutureWatcher<void> FutureWatcher;
 
     int numSeconds;
 
     string recordFileName;
 
     void RecordAndWrite();
+
 
 };
 

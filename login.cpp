@@ -1,6 +1,6 @@
 #include "login.h"
 #include "ui_login.h"
-#include "signin.h"
+#include "signup.h"
 #include "progressbar.h"
 #include <QtCore>
 #include <QtGui>
@@ -101,12 +101,14 @@ bool login::Validate(std::string username) {
 }
 
 void login::on_signupButton_clicked() {
-    signin signin_diag(this, numSeconds, &usernameMap, trainFile1, trainFile2);
-    signin_diag.setModal(true);
+    signup signup_diag(this, numSeconds, &usernameMap, trainFile1, trainFile2);
+    signup_diag.setModal(true);
     this->setVisible(false);
-    signin_diag.exec();
+    signup_diag.exec();
+    ui->lineEdit->setText("");
     this->setVisible(true);
 }
+
 
 void login::on_lineEdit_returnPressed()
 {

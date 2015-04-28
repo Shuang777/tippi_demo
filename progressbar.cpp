@@ -1,6 +1,5 @@
 #include "progressbar.h"
 #include "ui_progressbar.h"
-#include "incprogressbar.h"
 #include <QKeyEvent>
 #include <QMessageBox>
 #include <portaudio.h>
@@ -16,16 +15,14 @@ progressbar::progressbar(QWidget *parent, int numSeconds, string recordFileName)
     ui->setupUi(this);
     ui->progressBar->setValue(0);
     ui->label->setText("Press Enter and record passphrase (" + QString::number(numSeconds) + " seconds)");
+    connect(this, SIGNAL(ValueChanged(int)), ui->progressBar, SLOT(setValue(int)));
 }
 
 void progressbar::keyPressEvent(QKeyEvent * e) {
     QString lastKey = e->text();
     if (lastKey == "\r") {      // Check if is Enter
-        IncProgressBar incProgressBar(ui->progressBar, 3);
-        incProgressBar.start();
         RecordAndWrite();
-        incProgressBar.wait();
-        //QThread::msleep(150);
+        QThread::msleep(300);
         close();
     } else if (lastKey == "\033") {     // if is Esc
         close();
@@ -64,7 +61,14 @@ void progressbar::RecordAndWrite() {
     err = Pa_StartStream( stream );
     if( err != paNoError ) QMessageBox::critical(0,"Error", Pa_GetErrorText( err ) );
 
-    while( ( err = Pa_IsStreamActive( stream ) ) == 1 ) { Pa_Sleep(1000); }
+    int countMilSec = 0;
+    int tot_mil_seconds = 1000 * numSeconds;
+    while( ( err = Pa_IsStreamActive( stream ) ) == 1 ) {
+        Pa_Sleep(200);
+        countMilSec += 200;
+        emit ValueChanged(int(countMilSec*100/tot_mil_seconds));
+    }
+
     if( err != paNoError ) QMessageBox::critical(0,"Error", Pa_GetErrorText( err ) );
 
     err = Pa_CloseStream( stream );
@@ -85,6 +89,8 @@ void progressbar::RecordAndWrite() {
         QMessageBox::critical(0,"Error",sf_strerror(file));
     }
     sf_close (file) ;
+
+    emit ValueChanged(100);
 
     /*  // Now playing back
     data.frameIndex = 0;

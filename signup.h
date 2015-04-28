@@ -1,21 +1,21 @@
-#ifndef SIGNIN_H
-#define SIGNIN_H
+#ifndef SIGNUP_H
+#define SIGNUP_H
 
 #include <QDialog>
 #include "basics.h"
 using std::string;
 
 namespace Ui {
-class signin;
+class signup;
 }
 
-class signin : public QDialog
+class signup : public QDialog
 {
     Q_OBJECT
 
 public:
-    explicit signin(QWidget *parent, int numSeconds, UserMap *usernameMap, string trainFile1, string trainFile2);
-    ~signin();
+    explicit signup(QWidget *parent, int numSeconds, UserMap *usernameMap, string trainFile1, string trainFile2);
+    ~signup();
 
 private slots:
     void on_radioButtonMale_clicked();
@@ -30,8 +30,6 @@ private slots:
 
     void on_recordButton_clicked();
 
-    void on_lineEdit_returnPressed();
-
     void on_lineEdit_editingFinished();
 
     void on_checkBox3_clicked();
@@ -41,7 +39,7 @@ private slots:
     void on_checkBox2_clicked();
 
 private:
-    Ui::signin *ui;
+    Ui::signup *ui;
     QString male_ico;
     QString female_ico;
     QImage male_img;
@@ -51,8 +49,6 @@ private:
     UserMap *usernameMap;
     string trainFile1;
     string trainFile2;
-    bool trainFile1Passed;
-    bool trainFile2Passed;
 
     /// Check if the recorded wav file meets criteria (e.g. speech length)
     bool CheckRecording(string trainFile);
@@ -61,4 +57,4 @@ private:
     void Enroll(string username, Gender gender);
 };
 
-#endif // SIGNIN_H
+#endif // SIGNUP_H

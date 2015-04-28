@@ -20,24 +20,16 @@ progressbar::progressbar(QWidget *parent, int numSeconds, string recordFileName)
 
 void progressbar::keyPressEvent(QKeyEvent * e) {
     QString lastKey = e->text();
-    if (lastKey == "\r") {
-        bool passed = false;
-        while(!passed) {
-            IncProgressBar incProgressBar(ui->progressBar, 3);
-            incProgressBar.start();
-            RecordAndWrite();
-            incProgressBar.wait();
-            passed = CheckRecord();
-        }
-        QThread::msleep(300);
+    if (lastKey == "\r") {      // Check if is Enter
+        IncProgressBar incProgressBar(ui->progressBar, 3);
+        incProgressBar.start();
+        RecordAndWrite();
+        incProgressBar.wait();
+        //QThread::msleep(150);
         close();
-    } else if (lastKey == "\033") {     //esc
+    } else if (lastKey == "\033") {     // if is Esc
         close();
     }
-}
-
-bool progressbar::CheckRecord() {
-    return true;
 }
 
 void progressbar::RecordAndWrite() {

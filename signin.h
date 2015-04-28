@@ -30,6 +30,16 @@ private slots:
 
     void on_recordButton_clicked();
 
+    void on_lineEdit_returnPressed();
+
+    void on_lineEdit_editingFinished();
+
+    void on_checkBox3_clicked();
+
+    void on_checkBox_clicked();
+
+    void on_checkBox2_clicked();
+
 private:
     Ui::signin *ui;
     QString male_ico;
@@ -41,6 +51,14 @@ private:
     UserMap *usernameMap;
     string trainFile1;
     string trainFile2;
+    bool trainFile1Passed;
+    bool trainFile2Passed;
+
+    /// Check if the recorded wav file meets criteria (e.g. speech length)
+    bool CheckRecording(string trainFile);
+
+    /// Enroll the user
+    void Enroll(string username, Gender gender);
 };
 
 #endif // SIGNIN_H

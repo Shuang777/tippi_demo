@@ -45,6 +45,9 @@ private:
 
     void LoadUserInfo();
 
+    bool Validate(string username);
+
+    void SetCenterOfApplication();
 };
 
 #endif // LOGIN_H

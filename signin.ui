@@ -35,7 +35,7 @@
      <x>30</x>
      <y>200</y>
      <width>231</width>
-     <height>127</height>
+     <height>131</height>
     </rect>
    </property>
    <layout class="QVBoxLayout" name="verticalLayout">
@@ -50,6 +50,25 @@
       </item>
       <item>
        <widget class="QLineEdit" name="lineEdit"/>
+      </item>
+      <item>
+       <widget class="QCheckBox" name="checkBox3">
+        <property name="mouseTracking">
+         <bool>false</bool>
+        </property>
+        <property name="focusPolicy">
+         <enum>Qt::NoFocus</enum>
+        </property>
+        <property name="autoFillBackground">
+         <bool>false</bool>
+        </property>
+        <property name="text">
+         <string/>
+        </property>
+        <property name="checkable">
+         <bool>true</bool>
+        </property>
+       </widget>
       </item>
      </layout>
     </item>
@@ -72,24 +91,70 @@
      </layout>
     </item>
     <item>
-     <widget class="QPushButton" name="recordButton">
-      <property name="focusPolicy">
-       <enum>Qt::NoFocus</enum>
-      </property>
-      <property name="text">
-       <string>Record passphrase</string>
-      </property>
-     </widget>
+     <layout class="QHBoxLayout" name="horizontalLayout_4">
+      <item>
+       <widget class="QPushButton" name="recordButton">
+        <property name="focusPolicy">
+         <enum>Qt::NoFocus</enum>
+        </property>
+        <property name="text">
+         <string>Record passphrase</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QCheckBox" name="checkBox">
+        <property name="enabled">
+         <bool>true</bool>
+        </property>
+        <property name="mouseTracking">
+         <bool>false</bool>
+        </property>
+        <property name="focusPolicy">
+         <enum>Qt::NoFocus</enum>
+        </property>
+        <property name="text">
+         <string/>
+        </property>
+        <property name="checkable">
+         <bool>true</bool>
+        </property>
+       </widget>
+      </item>
+     </layout>
     </item>
     <item>
-     <widget class="QPushButton" name="recordAgainButton">
-      <property name="focusPolicy">
-       <enum>Qt::NoFocus</enum>
-      </property>
-      <property name="text">
-       <string>Record Again</string>
-      </property>
-     </widget>
+     <layout class="QHBoxLayout" name="horizontalLayout_5">
+      <item>
+       <widget class="QPushButton" name="recordAgainButton">
+        <property name="focusPolicy">
+         <enum>Qt::NoFocus</enum>
+        </property>
+        <property name="text">
+         <string>Record Again</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QCheckBox" name="checkBox2">
+        <property name="enabled">
+         <bool>true</bool>
+        </property>
+        <property name="mouseTracking">
+         <bool>false</bool>
+        </property>
+        <property name="focusPolicy">
+         <enum>Qt::NoFocus</enum>
+        </property>
+        <property name="text">
+         <string/>
+        </property>
+        <property name="checkable">
+         <bool>true</bool>
+        </property>
+       </widget>
+      </item>
+     </layout>
     </item>
    </layout>
   </widget>
@@ -125,6 +190,13 @@
   <zorder>layoutWidget</zorder>
   <zorder>layoutWidget</zorder>
   <zorder>logo</zorder>
+  <zorder>checkBox</zorder>
+  <zorder>recordButton</zorder>
+  <zorder>checkBox2</zorder>
+  <zorder>recordAgainButton</zorder>
+  <zorder>checkBox3</zorder>
+  <zorder>lineEdit</zorder>
+  <zorder>label</zorder>
  </widget>
  <tabstops>
   <tabstop>cancelButton</tabstop>

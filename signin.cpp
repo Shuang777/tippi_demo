@@ -10,9 +10,15 @@ signin::signin(QWidget *parent, int numSeconds, UserMap *usernameMap, string tra
     numSeconds(numSeconds),
     usernameMap(usernameMap),
     trainFile1(trainFile1),
-    trainFile2(trainFile2)
+    trainFile2(trainFile2),
+    trainFile1Passed(false),
+    trainFile2Passed(false)
 {
     ui->setupUi(this);
+
+    ui->checkBox->setFixedSize(21,21);
+    ui->checkBox2->setFixedSize(21,21);
+    ui->checkBox3->setFixedSize(21,21);
 
     male_ico = "/home/shuang/project/tippi/final/demo/male.ico";
     female_ico = "/home/shuang/project/tippi/final/demo/female.ico";
@@ -26,6 +32,12 @@ signin::signin(QWidget *parent, int numSeconds, UserMap *usernameMap, string tra
 
     ui->logo->setPixmap(QPixmap::fromImage(male_img));
     ui->radioButtonMale->setChecked(true);
+
+    ui->checkBox->setChecked(false);
+    ui->checkBox2->setChecked(false);
+    ui->checkBox3->setChecked(false);
+
+
 }
 
 signin::~signin()
@@ -61,27 +73,90 @@ void signin::on_doneButton_clicked()
         return;
     }
     if (username == "") {
-        QMessageBox::information(this, "Info", "Please input username first.");
+        QMessageBox::information(this, "Info", "Please input username.");
         return;
     } else if (usernameMap->find(username) != usernameMap->end()) {
         QMessageBox::information(this, "Info", "Username occupied. Please choose another.");
         return;
-    } else {
-        usernameMap->insert(pair<string, Gender>(username,gender));
-        close();
     }
+
+    if (!trainFile1Passed) {
+        QMessageBox::information(this, "Info", "Passphrase recording not qualified.");
+        return;
+    }
+    if (!trainFile2Passed) {
+        QMessageBox::information(this, "Info", "The 2nd passphrase recording not qualified.");
+    }
+
+    Enroll(username, gender);
+
+    close();
 }
 
-void signin::on_recordAgainButton_clicked()
-{
-    progressbar recordprogress(this, numSeconds, trainFile1);
-    recordprogress.setModal(true);
-    recordprogress.exec();
+void signin::Enroll(string username, Gender gender) {
+    usernameMap->insert(pair<string, Gender>(username,gender));
 }
 
 void signin::on_recordButton_clicked()
 {
+    progressbar recordprogress(this, numSeconds, trainFile1);
+    recordprogress.setModal(true);
+    recordprogress.exec();
+    trainFile1Passed = CheckRecording(trainFile1);
+    if (trainFile1Passed) {
+        ui->checkBox->setChecked(true);
+    } else {
+        ui->checkBox->setChecked(false);
+    }
+    ui->checkBox->repaint();
+}
+
+void signin::on_recordAgainButton_clicked()
+{
     progressbar recordprogress(this, numSeconds, trainFile2);
     recordprogress.setModal(true);
     recordprogress.exec();
+    trainFile2Passed = CheckRecording(trainFile2);
+    if (trainFile2Passed) {
+        ui->checkBox2->setChecked(true);
+    } else {
+        ui->checkBox2->setChecked(false);
+    }
+    ui->checkBox2->repaint();
+}
+
+bool signin::CheckRecording(string trainFile)
+{
+    return true;
+}
+
+void signin::on_lineEdit_returnPressed()
+{
+
+}
+
+void signin::on_lineEdit_editingFinished()
+{
+    string username = ui->lineEdit->text().toStdString();
+    if (username != "" && usernameMap->find(username) == usernameMap->end()) {
+        ui->checkBox3->setChecked(true);
+    } else {
+        ui->checkBox3->setChecked(false);
+    }
+    ui->checkBox3->repaint();
+}
+
+void signin::on_checkBox3_clicked()
+{
+    ui->checkBox3->setChecked(!ui->checkBox3->isChecked());
+}
+
+void signin::on_checkBox_clicked()
+{
+    ui->checkBox->setChecked(!ui->checkBox->isChecked());
+}
+
+void signin::on_checkBox2_clicked()
+{
+    ui->checkBox2->setChecked(!ui->checkBox2->isChecked());
 }

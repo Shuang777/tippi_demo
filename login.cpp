@@ -7,6 +7,7 @@
 #include <QMessageBox>
 #include <QFileDialog>
 #include <fstream>
+#include <QDesktopWidget>
 using std::pair;
 
 login::login(QWidget *parent) :
@@ -31,11 +32,25 @@ login::login(QWidget *parent) :
     trainFile1 = wavDir + "/tmp/train1.wav";
     trainFile2 = wavDir + "/tmp/train1.wav";
 
-    numSeconds = 3;
+    numSeconds = 2;
 
     LoadUserInfo();
 
     connect(ui->lineEdit, SIGNAL(returnPressed()),ui->loginButton,SLOT(click()));
+
+    SetCenterOfApplication();
+}
+
+void login::SetCenterOfApplication()
+{
+    QDesktopWidget* desktop = QApplication::desktop();
+    int width = desktop->width();
+    int height = desktop->height();
+    int mw = this->width();
+    int mh = this->height();
+    int centerW = (width/2) - (mw/2);
+    int centerH = (height/2) - (mh/2);
+    this->move(centerW, centerH);
 }
 
 login::~login() {
@@ -73,6 +88,16 @@ void login::on_loginButton_clicked() {
     progressbar recordprogress(this, numSeconds, testFile);
     recordprogress.setModal(true);
     recordprogress.exec();
+    bool checkPassed = Validate(username);     // validate if the recored wav file match user's info
+    if (checkPassed) {
+        QMessageBox::information(this, "Info", "Login succeed!");
+    } else {
+        QMessageBox::information(this, "Info", "Login failed, please try again.");
+    }
+}
+
+bool login::Validate(std::string username) {
+    return true;
 }
 
 void login::on_signupButton_clicked() {

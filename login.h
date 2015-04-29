@@ -28,6 +28,8 @@ private slots:
 
     void on_lineEdit_returnPressed();
 
+    void SetNewUsername(string username);
+
 private:
     Ui::login *ui;
     signup *signup_diag;
@@ -36,9 +38,6 @@ private:
     string testFile;
     string trainFile1;
     string trainFile2;
-
-    string trainScp;
-    string testScp;
 
     /// Directory for all the data/file
     string dataDir;
@@ -49,15 +48,17 @@ private:
 
     string modelDir;
 
-    string tmpWavDir;
-    string tmpFileDir;
+    string tmpDir;
+
+    string newUsername;
 
     /// If the models are with derived variables
     const bool derived_in = true;
     /// class for ivector extraction and evaluation
     IvectorExtraction ivectorExtraction;
 
-    int numSeconds;
+    /// length of the passphrase
+    int milSeconds;
 
     UserMap usernameMap;
 
@@ -69,8 +70,13 @@ private:
     /// Set the window location
     void SetCenterOfApplication();
 
-    /// scp file for kaldi interface
-    void PrepScpFile();
+    void SetKaldiEnv();
+
+    /// rewrite the userinfo file
+    void UpdateUserInfo();
+
+    void SaveNewUser();
+
 };
 
 #endif // LOGIN_H

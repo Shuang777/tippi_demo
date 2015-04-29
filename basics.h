@@ -10,6 +10,14 @@ enum Gender {
     female
 };
 
+const string pathFile = "/home/shuang/project/tippi/final/demo/path.sh";
+
 typedef unordered_map<string, Gender> UserMap;
+
+string replace_str(const string& str, const string& from, const string& to);
+
+void compute_feat(string utt_id, string wavFile);
+
+void prep_scp_file(string scpFile, string utt_id, string wavFile);
 
 #endif // BASICS_H

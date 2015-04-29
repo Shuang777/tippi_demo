@@ -4,10 +4,11 @@
 #include <QMessageBox>
 using std::pair;
 
-signup::signup(QWidget *parent, int numSeconds, UserMap *usernameMap, string trainFile1, string trainFile2, IvectorExtraction *ivectorExtraction) :
+signup::signup(QWidget *parent, int milSeconds, UserMap *usernameMap, string trainFile1, string trainFile2,
+               IvectorExtraction *ivectorExtraction) :
     QDialog(parent),
     ui(new Ui::signup),
-    numSeconds(numSeconds),
+    milSeconds(milSeconds),
     usernameMap(usernameMap),
     trainFile1(trainFile1),
     trainFile2(trainFile2),
@@ -90,16 +91,20 @@ void signup::on_doneButton_clicked()
 
     Enroll(username, gender);
 
+    emit SendUsername(username);
+
     close();
 }
 
 void signup::Enroll(string username, Gender gender) {
     usernameMap->insert(pair<string, Gender>(username,gender));
+    compute_feat(username+"_1", trainFile1);
+    compute_feat(username+"_2", trainFile2);
 }
 
 void signup::on_recordButton_clicked()
 {
-    progressbar recordprogress(this, numSeconds, trainFile1);
+    progressbar recordprogress(this, milSeconds, trainFile1);
     recordprogress.setModal(true);
     recordprogress.exec();
     if (CheckRecording(trainFile1)) {
@@ -112,7 +117,7 @@ void signup::on_recordButton_clicked()
 
 void signup::on_recordAgainButton_clicked()
 {
-    progressbar recordprogress(this, numSeconds, trainFile2);
+    progressbar recordprogress(this, milSeconds, trainFile2);
     recordprogress.setModal(true);
     recordprogress.exec();
     if (CheckRecording(trainFile2)) {

@@ -17,7 +17,8 @@ SOURCES += main.cpp\
         login.cpp \
     progressbar.cpp \
     signup.cpp \
-    ivectorextraction.cpp
+    ivectorextraction.cpp \
+    basics.cpp
 
 HEADERS  += login.h \
     progressbar.h \
@@ -30,7 +31,7 @@ FORMS    += login.ui \
     signup.ui \
     progressbar.ui
 
-QMAKE_CXXFLAGS += -pthread -std=c++11 -msse -msse2 -rdynamic
+QMAKE_CXXFLAGS += -pthread -std=c++11 -msse -msse2 -rdynamic -w
 QMAKE_CXXFLAGS += -DKALDI_DOUBLEPRECISION=0 -DHAVE_POSIX_MEMALIGN  -Winit-self -DHAVE_EXECINFO_H=1 -rdynamic -DHAVE_CXXABI_H -DHAVE_ATLAS
 
 LIBS += /home/shuang/softwares/portaudio/lib/.libs/libportaudio.so \

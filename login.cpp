@@ -9,7 +9,7 @@
 #include <fstream>
 #include <QDesktopWidget>
 #include <sys/stat.h>
-#include <fstream>
+#include <QDebug>
 
 using std::pair;
 using std::endl;
@@ -34,18 +34,14 @@ login::login(QWidget *parent) :
     userInfoFile = dataDir + "/user_info";
 
     wavDir = dataDir + "/wav";
-    tmpWavDir = wavDir + "/tmp";
-
-    testFile = tmpWavDir + "/test.wav";
-    trainFile1 = tmpWavDir + "/train1.wav";
-    trainFile2 = tmpWavDir + "/train2.wav";
-
+    tmpDir = dataDir + "/tmp";
     fileDir = dataDir + "/files";
-    tmpFileDir = fileDir + "/tmp";
-    trainScp = tmpFileDir + "/train.scp";
-    testScp = tmpFileDir + "/test.scp";
-
     modelDir = dataDir + "/models";
+
+    testFile = tmpDir + "/test.wav";
+    trainFile1 = tmpDir + "/train1.wav";
+    trainFile2 = tmpDir + "/train2.wav";
+
     string femaleIvecMdl = modelDir + "/female_final_derived.ie";
     string femaleUbm = modelDir + "/female_final.ubm";
     string maleIvecMdl = modelDir + "/male_final_derived.ie";
@@ -53,12 +49,11 @@ login::login(QWidget *parent) :
 
     ivectorExtraction.SetModels(femaleIvecMdl, femaleUbm, maleIvecMdl, maleUbm);
 
-    mkdir(tmpFileDir.c_str(), S_IRWXU | S_IRWXG | S_IROTH | S_IXOTH);
-    mkdir(tmpWavDir.c_str(), S_IRWXU | S_IRWXG | S_IROTH | S_IXOTH);
+    mkdir(tmpDir.c_str(), S_IRWXU | S_IRWXG | S_IROTH | S_IXOTH);
+    mkdir(wavDir.c_str(), S_IRWXU | S_IRWXG | S_IROTH | S_IXOTH);
+    mkdir(fileDir.c_str(), S_IRWXU | S_IRWXG | S_IROTH | S_IXOTH);
 
-    numSeconds = 2;
-
-    PrepScpFile();
+    milSeconds = 2500;
 
     LoadUserInfo();
 
@@ -67,15 +62,27 @@ login::login(QWidget *parent) :
     SetCenterOfApplication();
 }
 
-void login::PrepScpFile() {
-    ofstream os;
-    os.open(trainScp);
-    os << "train1" << '\t' << trainFile1 << endl;
-    os << "train2" << '\t' << trainFile2 << endl;
-    os.close();
-    os.open(testScp);
-    os << "test" << '\t' << testFile << endl;
-    os.close();
+void login::SetKaldiEnv() {
+    string path = getenv("PATH");
+    string kaldiRoot = "/home/shuang/project/kaldi/trunk";
+    qDebug() << QString::fromStdString(path);
+    path = "PATH=" + kaldiRoot + "/src/online2bin:"
+                   + kaldiRoot + "/src/bin:"
+                   + kaldiRoot + "/tools/openfst/bin"
+                   + kaldiRoot + "/src/fstbin/:"
+                   + kaldiRoot + "/src/gmmbin/:"
+                   + kaldiRoot + "/src/featbin/:"
+                   + kaldiRoot + "/src/lm/:"
+                   + kaldiRoot + "/src/sgmmbin/:"
+                   + kaldiRoot + "/src/sgmm2bin/:"
+                   + kaldiRoot + "/src/fgmmbin/:"
+                   + kaldiRoot + "/src/latbin/:"
+                   + kaldiRoot + "/src/nnetbin:"
+                   + kaldiRoot + "/src/nnet2bin:"
+                   + kaldiRoot + "/src/online2bin/:"
+                   + kaldiRoot + "/src/ivectorbin/:"
+                   + path;
+    putenv((char *)path.c_str());
 }
 
 void login::SetCenterOfApplication()
@@ -122,9 +129,14 @@ void login::on_loginButton_clicked() {
         QMessageBox::information(this, "Info", "Username not found.");
         return;
     }
-    progressbar recordprogress(this, numSeconds, testFile);
+
+    progressbar recordprogress(this, milSeconds, testFile);
     recordprogress.setModal(true);
     recordprogress.exec();
+
+    compute_feat("test", testFile);
+    //ComputeIvector(testFile);
+
     bool checkPassed = Validate(username);     // validate if the recored wav file match user's info
     if (checkPassed) {
         QMessageBox::information(this, "Info", "Login succeed!");
@@ -138,14 +150,34 @@ bool login::Validate(std::string username) {
 }
 
 void login::on_signupButton_clicked() {
-    signup signup_diag(this, numSeconds, &usernameMap, trainFile1, trainFile2, &ivectorExtraction);
+    signup signup_diag(this, milSeconds, &usernameMap, trainFile1, trainFile2, &ivectorExtraction);
     signup_diag.setModal(true);
     this->setVisible(false);
+    connect(&signup_diag, SIGNAL(SendUsername(string)), this, SLOT(SetNewUsername(string)));
     signup_diag.exec();
     ui->lineEdit->setText("");
     this->setVisible(true);
+    SaveNewUser();
+    UpdateUserInfo();
 }
 
+void login::SaveNewUser() {
+    string userDir = fileDir + "/" + newUsername;
+    //TODO
+    // move files around, gen ivectors
+}
+
+void login::SetNewUsername(string username) {
+    newUsername = username;
+}
+
+void login::UpdateUserInfo() {
+    ofstream os;
+    os.open(userInfoFile);
+    for ( auto it = usernameMap.begin(); it != usernameMap.end(); ++it )
+        os << it->first << '\t' << it->second;
+    os.close();
+}
 
 void login::on_lineEdit_returnPressed()
 {

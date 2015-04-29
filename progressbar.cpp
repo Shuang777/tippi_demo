@@ -6,15 +6,15 @@
 #include "portaudiocallback.h"
 #include <sndfile.h>
 
-progressbar::progressbar(QWidget *parent, int numSeconds, string recordFileName) :
+progressbar::progressbar(QWidget *parent, int milSeconds, string recordFileName) :
     QDialog(parent),
     ui(new Ui::progressbar),
-    numSeconds(numSeconds),
+    milSeconds(milSeconds),
     recordFileName(recordFileName)
 {
     ui->setupUi(this);
     ui->progressBar->setValue(0);
-    ui->label->setText("Press Enter and record passphrase (" + QString::number(numSeconds) + " seconds)");
+    ui->label->setText("Press Enter and record passphrase (" + QString::number(milSeconds/1000) + " seconds)");
     connect(this, SIGNAL(ValueChanged(int)), ui->progressBar, SLOT(setValue(int)));
 }
 
@@ -22,7 +22,6 @@ void progressbar::keyPressEvent(QKeyEvent * e) {
     QString lastKey = e->text();
     if (lastKey == "\r") {      // Check if is Enter
         RecordAndWrite();
-        QThread::msleep(300);
         close();
     } else if (lastKey == "\033") {     // if is Esc
         close();
@@ -30,7 +29,7 @@ void progressbar::keyPressEvent(QKeyEvent * e) {
 }
 
 void progressbar::RecordAndWrite() {
-    int totalFrames = numSeconds * SAMPLE_RATE;
+    int totalFrames = milSeconds * SAMPLE_RATE / 1000;
     paTestData data(totalFrames);
 
     PaError err = Pa_Initialize();
@@ -62,11 +61,10 @@ void progressbar::RecordAndWrite() {
     if( err != paNoError ) QMessageBox::critical(0,"Error", Pa_GetErrorText( err ) );
 
     int countMilSec = 0;
-    int tot_mil_seconds = 1000 * numSeconds;
     while( ( err = Pa_IsStreamActive( stream ) ) == 1 ) {
         Pa_Sleep(200);
         countMilSec += 200;
-        emit ValueChanged(int(countMilSec*100/tot_mil_seconds));
+        emit ValueChanged(int(countMilSec*100/milSeconds));
     }
 
     if( err != paNoError ) QMessageBox::critical(0,"Error", Pa_GetErrorText( err ) );

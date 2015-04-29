@@ -14,7 +14,7 @@ class progressbar : public QDialog
     Q_OBJECT
 
 public:
-    explicit progressbar(QWidget *parent, int numSeconds, string recordFileName);
+    explicit progressbar(QWidget *parent, int milSeconds, string recordFileName);
     ~progressbar();
 
 protected:
@@ -28,7 +28,7 @@ private:
 
     QFutureWatcher<void> FutureWatcher;
 
-    int numSeconds;
+    int milSeconds;
 
     string recordFileName;
 

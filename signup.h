@@ -15,7 +15,7 @@ class signup : public QDialog
     Q_OBJECT
 
 public:
-    explicit signup(QWidget *parent, int numSeconds, UserMap *usernameMap, string trainFile1, string trainFile2, IvectorExtraction *ivectorExtraction);
+    explicit signup(QWidget *parent, int milSeconds, UserMap *usernameMap, string trainFile1, string trainFile2, IvectorExtraction *ivectorExtraction);
     ~signup();
 
 private slots:
@@ -39,6 +39,9 @@ private slots:
 
     void on_checkBox2_clicked();
 
+signals:
+    void SendUsername(string username);
+
 private:
     Ui::signup *ui;
     QString male_ico;
@@ -46,7 +49,7 @@ private:
     QImage male_img;
     QImage female_img;
 
-    int numSeconds;
+    int milSeconds;
     UserMap *usernameMap;
     string trainFile1;
     string trainFile2;

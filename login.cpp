@@ -87,7 +87,7 @@ void login::LoadUserInfo() {
     char genderchar;
     Gender gender;
     while(infile >> username >> genderchar) {
-        if (genderchar == 'm') {
+        if (genderchar == '0') {
             gender = male;
         } else {
             gender = female;
@@ -116,10 +116,11 @@ void login::on_loginButton_clicked() {
 
     compute_feat("test", testFile);
     string feature_rspecifier = prep_feat(testFile);
-    string ivector_specifier = prep_ivec_spec(testFile);
-    ivectorExtraction.Extract(feature_rspecifier, ivector_specifier);
+    ivectorExtraction.SetGender(usernameMap[username]);
+    ivectorExtraction.Extract(feature_rspecifier, testIvector);
 
     bool checkPassed = Validate(username);     // validate if the recored wav file match user's info
+
     if (checkPassed) {
         QMessageBox::information(this, "Info", "Login succeed!");
     } else {
@@ -128,6 +129,11 @@ void login::on_loginButton_clicked() {
 }
 
 bool login::Validate(std::string username) {
+    string userDir = fileDir + "/" + username;
+    string userIvec1 = userDir + "/train1.ivec.ark";
+    ivectorExtraction.ReadIvector(userIvec1, trainIvector1);
+    string userIvec2 = userDir + "/train2.ivec.ark";
+    ivectorExtraction.ReadIvector(userIvec2, trainIvector2);
     return true;
 }
 
@@ -145,7 +151,11 @@ void login::on_signupButton_clicked() {
 
 void login::SaveNewUser() {
     string userDir = fileDir + "/" + newUsername;
-    // move files around, gen ivectors
+    mkdir(userDir.c_str(), S_IRWXU | S_IRWXG | S_IROTH | S_IXOTH);
+    string trainFileSave1 = userDir + "/train1.wav";
+    move_files(trainFile1, trainFileSave1);
+    string trainFileSave2 = userDir + "/train2.wav";
+    move_files(trainFile2, trainFileSave2);
 }
 
 void login::SetNewUsername(string username) {

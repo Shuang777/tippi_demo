@@ -72,3 +72,19 @@ void set_kaldi_env() {
                    + path;
     setenv("PATH", path.c_str(), 1);
 }
+
+void move_files(string oriFile, string newFile) {
+    rename(oriFile.c_str(), newFile.c_str());
+    string featArk = replace_str(oriFile, ".wav", ".mfcc.ark");
+    string newFeatArk = replace_str(newFile, ".wav", ".mfcc.ark");
+    rename(featArk.c_str(), newFeatArk.c_str());
+    string cmvnArk = replace_str(oriFile, ".wav", ".cmvn.ark");
+    string newCmvnArk = replace_str(newFile, ".wav", ".cmvn.ark");
+    rename(cmvnArk.c_str(), newCmvnArk.c_str());
+    string vadArk = replace_str(oriFile, ".wav", ".vad.ark");
+    string newVadArk = replace_str(newFile, ".wav", ".vad.ark");
+    rename(vadArk.c_str(), newVadArk.c_str());
+    string ivecArk = replace_str(oriFile, ".wav", ".ivec.ark");
+    string newIevArk = replace_str(newFile, ".wav", ".ivec.ark");
+    rename(ivecArk.c_str(), newIevArk.c_str());
+}

@@ -28,6 +28,7 @@ private slots:
 
     void on_lineEdit_returnPressed();
 
+    /// accept username from signup window
     void SetNewUsername(string username);
 
 private:
@@ -38,6 +39,10 @@ private:
     string testFile;
     string trainFile1;
     string trainFile2;
+
+    Vector<double> testIvector;
+    Vector<double> trainIvector1;
+    Vector<double> trainIvector2;
 
     /// Directory for all the data/file
     string dataDir;

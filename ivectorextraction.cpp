@@ -53,7 +53,7 @@ void IvectorExtraction::SetGender(Gender gender) {
     }
 }
 
-void IvectorExtraction::Extract(std::string feature_rspecifier, std::string ivector_wspecifier) {
+void IvectorExtraction::Extract(std::string feature_rspecifier, Vector<double> &ivector) {
     // assuming there is only one file in ivector_wspecifier
     // mostly copied from Kaldi codes
     SequentialBaseFloatMatrixReader feature_reader(feature_rspecifier);
@@ -76,6 +76,7 @@ void IvectorExtraction::Extract(std::string feature_rspecifier, std::string ivec
         KALDI_ASSERT(!gselect[t].empty());
         Vector<BaseFloat> loglikes;
         fgmm.LogLikelihoodsPreselect(frame, this_gselect, &loglikes);
+        loglikes.ApplySoftMax();
         // now "loglikes" contains posteriors.
         if (fabs(loglikes.Sum() - 1.0) <= 0.01) {
             if (min_post != 0.0) {
@@ -101,4 +102,32 @@ void IvectorExtraction::Extract(std::string feature_rspecifier, std::string ivec
         }
     }
 
+    // Extract ivector
+    bool need_2nd_order_stats = false;
+    IvectorExtractorUtteranceStats utt_stats(extractor.NumGauss(),
+                                             extractor.FeatDim(),
+                                             need_2nd_order_stats);
+    utt_stats.AccStats(mat, post);
+
+    ivector.Resize(extractor.IvectorDim());
+
+    ivector(0) = extractor.PriorOffset();
+    extractor.GetIvectorDistribution(utt_stats, &ivector, NULL);
+    ivector(0) -= extractor.PriorOffset();
+
+    // Normalize length
+    double norm = ivector.Norm(2.0);
+    double ratio = norm / sqrt(ivector.Dim());
+    ivector.Scale(1.0 / ratio);
+
+}
+
+void IvectorExtraction::WriteIvector(string ivecFile, string utt_id, const Vector<double> & ivector) {
+    BaseFloatVectorWriter ivector_writer("ark:"+ivecFile);
+    ivector_writer.Write(utt_id, (const Vector<BaseFloat>)ivector);
+}
+
+void IvectorExtraction::ReadIvector(string ivecFile, Vector<double> & ivector) {
+    SequentialBaseFloatVectorReader ivector_reader("ark:"+ivecFile);
+    ivector = (Vector<double>) ivector_reader.Value();
 }

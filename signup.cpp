@@ -98,15 +98,29 @@ void signup::on_doneButton_clicked()
 
 void signup::Enroll(string username, Gender gender) {
     usernameMap->insert(pair<string, Gender>(username,gender));
-    compute_feat(username+"_1", trainFile1);
-    compute_feat(username+"_2", trainFile2);
+    string utt_id = username + "_1";
+    compute_feat(utt_id, trainFile1);
+    string feature_rspecifier = prep_feat(trainFile1);
+    Vector<double> trainIvector1;
+    ivectorExtraction->Extract(feature_rspecifier, trainIvector1);
+    string ivecFile = prep_ivec_spec(trainFile1);
+    ivectorExtraction->WriteIvector(ivecFile, utt_id, trainIvector1);
+
+    utt_id = username + "_2";
+    compute_feat(utt_id, trainFile2);
+    feature_rspecifier = prep_feat(trainFile2);
+    Vector<double> trainIvector2;
+    ivectorExtraction->Extract(feature_rspecifier, trainIvector2);
+    ivecFile = prep_ivec_spec(trainFile2);
+    ivectorExtraction->WriteIvector(ivecFile, utt_id, trainIvector2);
 }
 
 void signup::on_recordButton_clicked()
 {
+    /*
     progressbar recordprogress(this, milSeconds, trainFile1);
     recordprogress.setModal(true);
-    recordprogress.exec();
+    recordprogress.exec();*/
     if (CheckRecording(trainFile1)) {
         ui->checkBox->setChecked(true);
     } else {
@@ -117,9 +131,10 @@ void signup::on_recordButton_clicked()
 
 void signup::on_recordAgainButton_clicked()
 {
+    /*
     progressbar recordprogress(this, milSeconds, trainFile2);
     recordprogress.setModal(true);
-    recordprogress.exec();
+    recordprogress.exec();*/
     if (CheckRecording(trainFile2)) {
         ui->checkBox2->setChecked(true);
     } else {

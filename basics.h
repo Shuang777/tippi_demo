@@ -26,4 +26,6 @@ string prep_ivec_spec(string wavFile);
 
 void set_kaldi_env();
 
+void move_files(string oriFile, string newFile);
+
 #endif // BASICS_H

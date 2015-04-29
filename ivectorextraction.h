@@ -15,7 +15,9 @@ public:
     ~IvectorExtraction();
     void SetModels(string femaleIvecMdl, string femaleUbm, string maleIvecMdl, string maleUbm);
     void SetGender(Gender gender);
-    void Extract(string feature_rspecifier, string ivector_wspecifier);
+    void Extract(string feature_rspecifier, Vector<double> &ivector);
+    static void WriteIvector(string ivecFile, string utt_id, const Vector<double> & ivector);
+    static void ReadIvector(string ivecFile, Vector<double> & ivector);
 
 private:
     IvectorExtractor extractor;

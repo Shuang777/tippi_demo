@@ -10,6 +10,7 @@
 #include <QDesktopWidget>
 #include <sys/stat.h>
 #include <QDebug>
+#include "base/kaldi-common.h"
 
 using std::pair;
 using std::endl;
@@ -60,29 +61,8 @@ login::login(QWidget *parent) :
     connect(ui->lineEdit, SIGNAL(returnPressed()),ui->loginButton,SLOT(click()));
 
     SetCenterOfApplication();
-}
 
-void login::SetKaldiEnv() {
-    string path = getenv("PATH");
-    string kaldiRoot = "/home/shuang/project/kaldi/trunk";
-    qDebug() << QString::fromStdString(path);
-    path = "PATH=" + kaldiRoot + "/src/online2bin:"
-                   + kaldiRoot + "/src/bin:"
-                   + kaldiRoot + "/tools/openfst/bin"
-                   + kaldiRoot + "/src/fstbin/:"
-                   + kaldiRoot + "/src/gmmbin/:"
-                   + kaldiRoot + "/src/featbin/:"
-                   + kaldiRoot + "/src/lm/:"
-                   + kaldiRoot + "/src/sgmmbin/:"
-                   + kaldiRoot + "/src/sgmm2bin/:"
-                   + kaldiRoot + "/src/fgmmbin/:"
-                   + kaldiRoot + "/src/latbin/:"
-                   + kaldiRoot + "/src/nnetbin:"
-                   + kaldiRoot + "/src/nnet2bin:"
-                   + kaldiRoot + "/src/online2bin/:"
-                   + kaldiRoot + "/src/ivectorbin/:"
-                   + path;
-    putenv((char *)path.c_str());
+    set_kaldi_env();
 }
 
 void login::SetCenterOfApplication()
@@ -129,13 +109,15 @@ void login::on_loginButton_clicked() {
         QMessageBox::information(this, "Info", "Username not found.");
         return;
     }
-
+/*
     progressbar recordprogress(this, milSeconds, testFile);
     recordprogress.setModal(true);
-    recordprogress.exec();
+    recordprogress.exec();*/
 
     compute_feat("test", testFile);
-    //ComputeIvector(testFile);
+    string feature_rspecifier = prep_feat(testFile);
+    string ivector_specifier = prep_ivec_spec(testFile);
+    ivectorExtraction.Extract(feature_rspecifier, ivector_specifier);
 
     bool checkPassed = Validate(username);     // validate if the recored wav file match user's info
     if (checkPassed) {
@@ -163,7 +145,6 @@ void login::on_signupButton_clicked() {
 
 void login::SaveNewUser() {
     string userDir = fileDir + "/" + newUsername;
-    //TODO
     // move files around, gen ivectors
 }
 
@@ -175,7 +156,7 @@ void login::UpdateUserInfo() {
     ofstream os;
     os.open(userInfoFile);
     for ( auto it = usernameMap.begin(); it != usernameMap.end(); ++it )
-        os << it->first << '\t' << it->second;
+        os << it->first << '\t' << it->second << endl;
     os.close();
 }
 

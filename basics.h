@@ -20,4 +20,10 @@ void compute_feat(string utt_id, string wavFile);
 
 void prep_scp_file(string scpFile, string utt_id, string wavFile);
 
+string prep_feat(string wavFile);
+
+string prep_ivec_spec(string wavFile);
+
+void set_kaldi_env();
+
 #endif // BASICS_H

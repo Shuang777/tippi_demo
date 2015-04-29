@@ -70,8 +70,6 @@ private:
     /// Set the window location
     void SetCenterOfApplication();
 
-    void SetKaldiEnv();
-
     /// rewrite the userinfo file
     void UpdateUserInfo();
 

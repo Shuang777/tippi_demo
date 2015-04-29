@@ -15,6 +15,7 @@ public:
     ~IvectorExtraction();
     void SetModels(string femaleIvecMdl, string femaleUbm, string maleIvecMdl, string maleUbm);
     void SetGender(Gender gender);
+    void Extract(string feature_rspecifier, string ivector_wspecifier);
 
 private:
     IvectorExtractor extractor;
@@ -29,6 +30,8 @@ private:
     string maleUbm;
 
     bool derived_in;
+    int num_gselect;
+    double min_post;
 };
 
 #endif // IVECTOREXTRACTION_H

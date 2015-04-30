@@ -5,6 +5,8 @@
 #include "base/kaldi-common.h"
 #include "util/common-utils.h"
 #include "gmm/full-gmm.h"
+using std::vector;
+using std::pair;
 
 using namespace kaldi;
 
@@ -20,7 +22,11 @@ public:
     static void WritePost(string postFile, string utt_id, const Posterior & post);
     static void ReadIvector(string ivecFile, Vector<double> & ivector);
     static void ReadPost(string postFile, Posterior &post);
-    static double Score(const Vector<double> & ivec1, const Vector<double> & ivec2);
+    static double Scoring(const Vector<double> & ivec1, const Vector<double> & ivec2);
+    static double Scoring(const Posterior & post1, const Posterior & post2);
+
+private:
+    static double Distance(const vector<pair<int,float> > &post1, const vector<pair<int,float> > &post2);
 
 private:
     IvectorExtractor extractor;

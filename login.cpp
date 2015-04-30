@@ -64,7 +64,8 @@ login::login(QWidget *parent) :
 
     set_kaldi_env();
 
-    tol = 0.08;
+    ivecScoreTol = 0.08;
+    postScoreTol = 0.20;
 
     skipRecording = true;
 }
@@ -146,14 +147,24 @@ bool login::Validate(std::string username) {
     string userPost2 = userDir + "/train2.post.ark";
     ivectorExtraction.ReadPost(userPost2, trainPost2);
 
-    double score1 = ivectorExtraction.Score(testIvector, trainIvector1);
-    double score2 = ivectorExtraction.Score(testIvector, trainIvector2);
-    double baseScore = ivectorExtraction.Score(trainIvector1, trainIvector2);
+    double score1 = ivectorExtraction.Scoring(testIvector, trainIvector1);
+    double score2 = ivectorExtraction.Scoring(testIvector, trainIvector2);
+    double baseScore = ivectorExtraction.Scoring(trainIvector1, trainIvector2);
+
     qDebug() << "score against train1: " << score1;
     qDebug() << "score against train2: " << score2;
     qDebug() << "base score: " << baseScore;
     qDebug() << "max / base: " << max(score1, score2) / baseScore;
-    if (max(score1, score2) > (1-tol) * baseScore)
+
+    double scorePost1 = ivectorExtraction.Scoring(testPost, trainPost1);
+    double scorePost2 = ivectorExtraction.Scoring(testPost, trainPost2);
+    double baseScorePost = ivectorExtraction.Scoring(trainPost1, trainPost2);
+
+    qDebug() << "scorePost1: " << scorePost1;
+    qDebug() << "scorePost2: " << scorePost2;
+    qDebug() << "baseScorePost: " << baseScorePost;
+
+    if ((max(score1, score2) > (1-ivecScoreTol) * baseScore) && (max(scorePost2, scorePost1) > (1 - postScoreTol) * baseScorePost))
         return true;
     else
         return false;
@@ -161,6 +172,19 @@ bool login::Validate(std::string username) {
 
 void login::on_signupButton_clicked() {
     signup signup_diag(this, milSeconds, &usernameMap, trainFile1, trainFile2, &ivectorExtraction, skipRecording);
+    signup_diag.setModal(true);
+    this->setVisible(false);
+    connect(&signup_diag, SIGNAL(SendUsername(string)), this, SLOT(SetNewUsername(string)));
+    signup_diag.exec();
+    ui->lineEdit->setText("");
+    this->setVisible(true);
+    SaveNewUser();
+    UpdateUserInfo();
+}
+
+void login::on_changeButton_clicked()
+{
+    signup signup_diag(this, milSeconds, &usernameMap, trainFile1, trainFile2, &ivectorExtraction, skipRecording, true);        // change mode
     signup_diag.setModal(true);
     this->setVisible(false);
     connect(&signup_diag, SIGNAL(SendUsername(string)), this, SLOT(SetNewUsername(string)));
@@ -196,3 +220,4 @@ void login::on_lineEdit_returnPressed()
 {
 
 }
+

@@ -31,6 +31,8 @@ private slots:
     /// accept username from signup window
     void SetNewUsername(string username);
 
+    void on_changeButton_clicked();
+
 private:
     Ui::login *ui;
     signup *signup_diag;
@@ -60,7 +62,8 @@ private:
     string newUsername;
 
     // Tolerance for scoring against baseline
-    double tol;
+    double ivecScoreTol;
+    double postScoreTol;
 
     /// If the models are with derived variables
     const bool derived_in = true;

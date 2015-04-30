@@ -2,6 +2,8 @@
 #include <vector>
 #include <QDebug>
 using std::vector;
+using std::pair;
+using std::max;
 
 IvectorExtraction::IvectorExtraction(bool derived_in) : derived_in(derived_in),
                                                         extractor() {
@@ -108,6 +110,42 @@ void IvectorExtraction::ReadPost(string postFile, Posterior & post) {
     post = posteriors_reader.Value();
 }
 
-double IvectorExtraction::Score(const Vector<double> & ivec1, const Vector<double> & ivec2) {
+double IvectorExtraction::Scoring(const Vector<double> & ivec1, const Vector<double> & ivec2) {
     return VecVec(ivec1, ivec2);
+}
+
+double IvectorExtraction::Scoring(const Posterior & post1, const Posterior & post2) {
+    double mismatchPenalty = 0;
+    int numFrames1 = post1.size();
+    int numFrames2 = post2.size();
+    Matrix<double> bestPath (numFrames1, numFrames2);
+    bestPath(0,0) = Distance(post1[0], post2[0]);
+    for (int i = 1; i < numFrames1; i++) {
+        bestPath(i,0) = Distance(post1[i], post2[0]) + bestPath(i-1,0) + mismatchPenalty;
+    }
+    for (int j = 1; j < numFrames2; j++) {
+        bestPath(0,j) = Distance(post1[0], post2[j]) + bestPath(0, j-1) + mismatchPenalty;
+    }
+    for (int i = 1; i < numFrames1; i++) {
+        for (int j = 1; j < numFrames2; j++) {
+            double path1Score = bestPath(i,j-1) + mismatchPenalty;  // horizontal path
+            double path2Score = bestPath(i-1,j) + mismatchPenalty;  // vertical path
+            double path3Score = bestPath(i-1,j-1);                  // diagnoal path
+            double bestScore = max(max(path1Score, path2Score), path3Score);
+            bestPath(i,j) = bestScore + Distance(post1[i],post2[j]);
+        }
+    }
+    return bestPath(numFrames1-1, numFrames2-1);
+}
+
+double IvectorExtraction::Distance(const vector<pair<int,float> > &post1, const vector<pair<int,float> > &post2) {
+    int firstN = 5;
+    double score = 0;
+    for (int i = 0; i < firstN && i < post1.size(); i++) {
+        for (int j = 0; j < firstN && j < post2.size(); j++) {
+            if (post1[i].first == post2[j].first)
+                score += post1[i].second * post2[j].second;
+        }
+    }
+    return score;
 }

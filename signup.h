@@ -15,7 +15,8 @@ class signup : public QDialog
     Q_OBJECT
 
 public:
-    explicit signup(QWidget *parent, int milSeconds, UserMap *usernameMap, string trainFile1, string trainFile2, IvectorExtraction *ivectorExtraction, bool skipRecording);
+    explicit signup(QWidget *parent, int milSeconds, UserMap *usernameMap, string trainFile1,
+                    string trainFile2, IvectorExtraction *ivectorExtraction, bool skipRecording, bool changeMode = false);
     ~signup();
 
 private slots:
@@ -49,6 +50,8 @@ private:
     QImage male_img;
     QImage female_img;
 
+    bool changeMode;        // change a passwd rather than sign up a new one
+
     /// for debug usage
     bool skipRecording;
 
@@ -63,6 +66,9 @@ private:
 
     /// Enroll the user
     void Enroll(string username, Gender gender);
+
+    /// if username pass the check
+    bool PassNameCheck(string username);
 };
 
 #endif // SIGNUP_H

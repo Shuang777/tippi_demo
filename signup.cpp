@@ -5,7 +5,7 @@
 using std::pair;
 
 signup::signup(QWidget *parent, int milSeconds, UserMap *usernameMap, string trainFile1, string trainFile2,
-               IvectorExtraction *ivectorExtraction, bool skipRecording) :
+               IvectorExtraction *ivectorExtraction, bool skipRecording, bool changeMode) :
     QDialog(parent),
     ui(new Ui::signup),
     milSeconds(milSeconds),
@@ -13,7 +13,8 @@ signup::signup(QWidget *parent, int milSeconds, UserMap *usernameMap, string tra
     trainFile1(trainFile1),
     trainFile2(trainFile2),
     ivectorExtraction(ivectorExtraction),
-    skipRecording(skipRecording)
+    skipRecording(skipRecording),
+    changeMode(changeMode)
 {
     ui->setupUi(this);
 
@@ -77,8 +78,11 @@ void signup::on_doneButton_clicked()
     if (username == "") {
         QMessageBox::information(this, "Info", "Please input username.");
         return;
-    } else if (usernameMap->find(username) != usernameMap->end()) {
+    } else if (!changeMode && usernameMap->find(username) != usernameMap->end()) {
         QMessageBox::information(this, "Info", "Username occupied. Please choose another.");
+        return;
+    } else if (changeMode && usernameMap->find(username) == usernameMap->end()) {
+        QMessageBox::information(this, "Info", "Username does not exist. Please check.");
         return;
     }
 
@@ -160,12 +164,20 @@ bool signup::CheckRecording(string trainFile)
 void signup::on_lineEdit_editingFinished()
 {
     string username = ui->lineEdit->text().toStdString();
-    if (username != "" && usernameMap->find(username) == usernameMap->end()) {
+    if (username != "" && PassNameCheck(username)) {
         ui->checkBox3->setChecked(true);
     } else {
         ui->checkBox3->setChecked(false);
     }
     ui->checkBox3->repaint();
+}
+
+bool signup::PassNameCheck(string username) {
+    if (changeMode) {
+        return usernameMap->find(username) != usernameMap->end();
+    } else {
+        return usernameMap->find(username) == usernameMap->end();
+    }
 }
 
 void signup::on_checkBox3_clicked()

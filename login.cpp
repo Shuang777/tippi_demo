@@ -67,7 +67,8 @@ login::login(QWidget *parent) :
     ivecScoreTol = 0.08;
     postScoreTol = 0.20;
 
-    skipRecording = true;
+    skipRecording = false;
+    saveWavFile = false;
 }
 
 void login::SetCenterOfApplication()
@@ -119,6 +120,11 @@ void login::on_loginButton_clicked() {
         progressbar recordprogress(this, milSeconds, testFile);
         recordprogress.setModal(true);
         recordprogress.exec();
+        if (saveWavFile) {
+            string testFileDir = fileDir + "/" + username +  "/tests";
+            mkdir(testFileDir.c_str(), S_IRWXU | S_IRWXG | S_IROTH | S_IXOTH);
+            check_and_copy_files(testFile, testFileDir);
+        }
     }
 
     compute_feat("test", testFile);
@@ -171,33 +177,41 @@ bool login::Validate(std::string username) {
 }
 
 void login::on_signupButton_clicked() {
-    signup signup_diag(this, milSeconds, &usernameMap, trainFile1, trainFile2, &ivectorExtraction, skipRecording);
+    bool changePasswdMode = false;
+    signup signup_diag(this, milSeconds, &usernameMap, trainFile1, trainFile2, &ivectorExtraction, skipRecording, changePasswdMode);
     signup_diag.setModal(true);
     this->setVisible(false);
     connect(&signup_diag, SIGNAL(SendUsername(string)), this, SLOT(SetNewUsername(string)));
     signup_diag.exec();
     ui->lineEdit->setText("");
     this->setVisible(true);
-    SaveNewUser();
+    SaveNewUser(changePasswdMode);
     UpdateUserInfo();
 }
 
 void login::on_changeButton_clicked()
 {
-    signup signup_diag(this, milSeconds, &usernameMap, trainFile1, trainFile2, &ivectorExtraction, skipRecording, true);        // change mode
+    bool changePasswdMode = true;
+    signup signup_diag(this, milSeconds, &usernameMap, trainFile1, trainFile2, &ivectorExtraction, skipRecording, changePasswdMode);        // change mode
     signup_diag.setModal(true);
     this->setVisible(false);
     connect(&signup_diag, SIGNAL(SendUsername(string)), this, SLOT(SetNewUsername(string)));
     signup_diag.exec();
     ui->lineEdit->setText("");
     this->setVisible(true);
-    SaveNewUser();
+    SaveNewUser(changePasswdMode);
     UpdateUserInfo();
 }
 
-void login::SaveNewUser() {
+void login::SaveNewUser(bool changePasswdMode) {
     string userDir = fileDir + "/" + newUsername;
     mkdir(userDir.c_str(), S_IRWXU | S_IRWXG | S_IROTH | S_IXOTH);
+    if (changePasswdMode && saveWavFile) {
+        string saveDir = userDir + "/trains";
+        mkdir(saveDir.c_str(), S_IRWXU | S_IRWXG | S_IROTH | S_IXOTH);
+        check_and_copy_files(trainFile1, saveDir);
+        check_and_copy_files(trainFile2, saveDir);
+    }
     string trainFileSave1 = userDir + "/train1.wav";
     move_files(trainFile1, trainFileSave1);
     string trainFileSave2 = userDir + "/train2.wav";
@@ -221,3 +235,23 @@ void login::on_lineEdit_returnPressed()
 
 }
 
+
+void login::on_actionSave_wave_files_triggered()
+{
+    saveWavFile = !saveWavFile;
+    if (saveWavFile) {
+        ui->actionSave_wave_files->setText("Overwrite wave files");
+    } else {
+        ui->actionSave_wave_files->setText("Save wave files");
+    }
+}
+
+void login::on_actionSkip_recording_triggered()
+{
+    skipRecording = !skipRecording;
+    if (skipRecording) {
+        ui->actionSkip_recording->setText("Record");
+    } else {
+        ui->actionSkip_recording->setText("Skip Recording");
+    }
+}

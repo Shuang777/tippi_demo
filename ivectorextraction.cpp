@@ -115,7 +115,7 @@ double IvectorExtraction::Scoring(const Vector<double> & ivec1, const Vector<dou
 }
 
 double IvectorExtraction::Scoring(const Posterior & post1, const Posterior & post2) {
-    double mismatchPenalty = 0;
+    double mismatchPenalty = -0.01;
     int numFrames1 = post1.size();
     int numFrames2 = post2.size();
     Matrix<double> bestPath (numFrames1, numFrames2);

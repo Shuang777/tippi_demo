@@ -30,4 +30,6 @@ void set_kaldi_env();
 
 void move_files(string oriFile, string newFile);
 
+void check_and_copy_files(string wavFile, string newDir);
+
 #endif // BASICS_H

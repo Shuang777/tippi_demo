@@ -33,6 +33,10 @@ private slots:
 
     void on_changeButton_clicked();
 
+    void on_actionSave_wave_files_triggered();
+
+    void on_actionSkip_recording_triggered();
+
 private:
     Ui::login *ui;
     signup *signup_diag;
@@ -86,10 +90,12 @@ private:
     /// rewrite the userinfo file
     void UpdateUserInfo();
 
-    void SaveNewUser();
+    void SaveNewUser(bool changePasswdMode);
 
     /// For debug usage
     bool skipRecording;
+
+    bool saveWavFile;
 };
 
 #endif // LOGIN_H

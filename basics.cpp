@@ -3,7 +3,9 @@
 #include <QDebug>
 #include <QString>
 using std::ofstream;
+using std::ifstream;
 using std::endl;
+using std::ios;
 
 string replace_str(const string& str, const string& from, const string& to) {
    string replaced = str;
@@ -94,4 +96,26 @@ void move_files(string oriFile, string newFile) {
     string postArk = replace_str(oriFile, ".wav", ".post.ark");
     string newPostArk = replace_str(newFile, ".wav", ".post.ark");
     rename(postArk.c_str(), newPostArk.c_str());
+}
+
+void check_and_copy_files(string wavFile, string newDir) {
+    int index = 0;
+    string newFile = newDir + "/recording_" + std::to_string(index) + ".wav";
+    ifstream infile;
+    infile.open(newFile);
+    while (infile.good()) {
+        index++;
+        newFile = newDir + "/test_" + std::to_string(index) + ".wav";
+        infile.close();
+        infile.open(newFile);
+    }
+    infile.close();
+
+    ifstream source(wavFile, ios::binary);
+    ofstream dest(newFile, ios::binary);
+
+    dest << source.rdbuf();
+
+    source.close();
+    dest.close();
 }

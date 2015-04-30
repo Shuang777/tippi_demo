@@ -15,7 +15,7 @@ class signup : public QDialog
     Q_OBJECT
 
 public:
-    explicit signup(QWidget *parent, int milSeconds, UserMap *usernameMap, string trainFile1, string trainFile2, IvectorExtraction *ivectorExtraction);
+    explicit signup(QWidget *parent, int milSeconds, UserMap *usernameMap, string trainFile1, string trainFile2, IvectorExtraction *ivectorExtraction, bool skipRecording);
     ~signup();
 
 private slots:
@@ -48,6 +48,9 @@ private:
     QString female_ico;
     QImage male_img;
     QImage female_img;
+
+    /// for debug usage
+    bool skipRecording;
 
     int milSeconds;
     UserMap *usernameMap;

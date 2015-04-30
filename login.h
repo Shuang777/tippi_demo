@@ -81,6 +81,8 @@ private:
 
     void SaveNewUser();
 
+    /// For debug usage
+    bool skipRecording;
 };
 
 #endif // LOGIN_H

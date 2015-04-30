@@ -50,6 +50,7 @@ login::login(QWidget *parent) :
 
     ivectorExtraction.SetModels(femaleIvecMdl, femaleUbm, maleIvecMdl, maleUbm);
 
+    mkdir(dataDir.c_str(), S_IRWXU | S_IRWXG | S_IROTH | S_IXOTH);
     mkdir(tmpDir.c_str(), S_IRWXU | S_IRWXG | S_IROTH | S_IXOTH);
     mkdir(fileDir.c_str(), S_IRWXU | S_IRWXG | S_IROTH | S_IXOTH);
 
@@ -64,6 +65,8 @@ login::login(QWidget *parent) :
     set_kaldi_env();
 
     tol = 0.08;
+
+    skipRecording = false;
 }
 
 void login::SetCenterOfApplication()
@@ -111,9 +114,11 @@ void login::on_loginButton_clicked() {
         return;
     }
 
-    progressbar recordprogress(this, milSeconds, testFile);
-    recordprogress.setModal(true);
-    recordprogress.exec();
+    if (!skipRecording) {
+        progressbar recordprogress(this, milSeconds, testFile);
+        recordprogress.setModal(true);
+        recordprogress.exec();
+    }
 
     compute_feat("test", testFile);
     string feature_rspecifier = prep_feat(testFile);
@@ -149,7 +154,7 @@ bool login::Validate(std::string username) {
 }
 
 void login::on_signupButton_clicked() {
-    signup signup_diag(this, milSeconds, &usernameMap, trainFile1, trainFile2, &ivectorExtraction);
+    signup signup_diag(this, milSeconds, &usernameMap, trainFile1, trainFile2, &ivectorExtraction, skipRecording);
     signup_diag.setModal(true);
     this->setVisible(false);
     connect(&signup_diag, SIGNAL(SendUsername(string)), this, SLOT(SetNewUsername(string)));

@@ -5,14 +5,15 @@
 using std::pair;
 
 signup::signup(QWidget *parent, int milSeconds, UserMap *usernameMap, string trainFile1, string trainFile2,
-               IvectorExtraction *ivectorExtraction) :
+               IvectorExtraction *ivectorExtraction, bool skipRecording) :
     QDialog(parent),
     ui(new Ui::signup),
     milSeconds(milSeconds),
     usernameMap(usernameMap),
     trainFile1(trainFile1),
     trainFile2(trainFile2),
-    ivectorExtraction(ivectorExtraction)
+    ivectorExtraction(ivectorExtraction),
+    skipRecording(skipRecording)
 {
     ui->setupUi(this);
 
@@ -117,9 +118,11 @@ void signup::Enroll(string username, Gender gender) {
 
 void signup::on_recordButton_clicked()
 {
-    progressbar recordprogress(this, milSeconds, trainFile1);
-    recordprogress.setModal(true);
-    recordprogress.exec();
+    if (!skipRecording) {
+        progressbar recordprogress(this, milSeconds, trainFile1);
+        recordprogress.setModal(true);
+        recordprogress.exec();
+    }
     if (CheckRecording(trainFile1)) {
         ui->checkBox->setChecked(true);
     } else {
@@ -130,9 +133,11 @@ void signup::on_recordButton_clicked()
 
 void signup::on_recordAgainButton_clicked()
 {
-    progressbar recordprogress(this, milSeconds, trainFile2);
-    recordprogress.setModal(true);
-    recordprogress.exec();
+    if (!skipRecording) {
+        progressbar recordprogress(this, milSeconds, trainFile2);
+        recordprogress.setModal(true);
+        recordprogress.exec();
+    }
     if (CheckRecording(trainFile2)) {
         ui->checkBox2->setChecked(true);
     } else {

@@ -53,19 +53,19 @@ void IvectorExtraction::SetGender(Gender gender) {
     }
 }
 
-void IvectorExtraction::Extract(std::string feature_rspecifier, Vector<double> &ivector) {
+void IvectorExtraction::Extract(std::string feature_rspecifier, Vector<double> &ivector, Posterior &post) {
     // assuming there is only one file in ivector_wspecifier
     // mostly copied from Kaldi codes
     SequentialBaseFloatMatrixReader feature_reader(feature_rspecifier);
     const Matrix<BaseFloat> &mat = feature_reader.Value();
     int32 num_frames = mat.NumRows();
     const FullGmm &fgmm = (gender == male) ? maleFgmm : femaleFgmm;
-    double tot_like_this_file = 0;
-    Posterior post(num_frames);
+    double tot_posterior = 0;
+    post.resize(num_frames);
     for (int32 i = 0; i < mat.NumRows(); i++) {
-        tot_like_this_file += fgmm.GaussianSelection(mat.Row(i), num_gselect, post[i]);
+        tot_posterior += fgmm.GaussianSelection(mat.Row(i), num_gselect, post[i]);
     }
-    qDebug() << "tot_like_this_file: " << tot_like_this_file / num_frames << "per frame"
+    qDebug() << "tot_posterior: " << tot_posterior / num_frames << "per frame"
              << "on " << num_frames << " frames";
 
     // Extract ivector
@@ -96,6 +96,16 @@ void IvectorExtraction::WriteIvector(string ivecFile, string utt_id, const Vecto
 void IvectorExtraction::ReadIvector(string ivecFile, Vector<double> & ivector) {
     SequentialBaseFloatVectorReader ivector_reader("ark:"+ivecFile);
     ivector = (Vector<double>) ivector_reader.Value();
+}
+
+void IvectorExtraction::WritePost(string postFile, string utt_id, const Posterior & post) {
+    PosteriorWriter post_writer("ark:" + postFile);
+    post_writer.Write(utt_id, post);
+}
+
+void IvectorExtraction::ReadPost(string postFile, Posterior & post) {
+    SequentialPosteriorReader posteriors_reader("ark:"+postFile);
+    post = posteriors_reader.Value();
 }
 
 double IvectorExtraction::Score(const Vector<double> & ivec1, const Vector<double> & ivec2) {

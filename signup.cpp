@@ -103,17 +103,23 @@ void signup::Enroll(string username, Gender gender) {
     compute_feat(utt_id, trainFile1);
     string feature_rspecifier = prep_feat(trainFile1);
     Vector<double> trainIvector1;
-    ivectorExtraction->Extract(feature_rspecifier, trainIvector1);
+    Posterior trainPost1;
+    ivectorExtraction->Extract(feature_rspecifier, trainIvector1, trainPost1);
     string ivecFile = prep_ivec_spec(trainFile1);
     ivectorExtraction->WriteIvector(ivecFile, utt_id, trainIvector1);
+    string postFile = prep_post_spec(trainFile1);
+    ivectorExtraction->WritePost(postFile, utt_id, trainPost1);
 
     utt_id = username + "_2";
     compute_feat(utt_id, trainFile2);
     feature_rspecifier = prep_feat(trainFile2);
     Vector<double> trainIvector2;
-    ivectorExtraction->Extract(feature_rspecifier, trainIvector2);
+    Posterior trainPost2;
+    ivectorExtraction->Extract(feature_rspecifier, trainIvector2, trainPost2);
     ivecFile = prep_ivec_spec(trainFile2);
     ivectorExtraction->WriteIvector(ivecFile, utt_id, trainIvector2);
+    postFile = prep_post_spec(trainFile2);
+    ivectorExtraction->WritePost(postFile, utt_id, trainPost2);
 }
 
 void signup::on_recordButton_clicked()

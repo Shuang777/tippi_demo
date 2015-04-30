@@ -44,6 +44,10 @@ private:
     Vector<double> trainIvector1;
     Vector<double> trainIvector2;
 
+    Posterior testPost;
+    Posterior trainPost1;
+    Posterior trainPost2;
+
     /// Directory for all the data/file
     string dataDir;
     /// Subdirectory for speaker files

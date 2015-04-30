@@ -66,7 +66,7 @@ login::login(QWidget *parent) :
 
     tol = 0.08;
 
-    skipRecording = false;
+    skipRecording = true;
 }
 
 void login::SetCenterOfApplication()
@@ -123,7 +123,7 @@ void login::on_loginButton_clicked() {
     compute_feat("test", testFile);
     string feature_rspecifier = prep_feat(testFile);
     ivectorExtraction.SetGender(usernameMap[username]);
-    ivectorExtraction.Extract(feature_rspecifier, testIvector);
+    ivectorExtraction.Extract(feature_rspecifier, testIvector, testPost);
 
     bool checkPassed = Validate(username);     // validate if the recored wav file match user's info
 
@@ -140,6 +140,12 @@ bool login::Validate(std::string username) {
     ivectorExtraction.ReadIvector(userIvec1, trainIvector1);
     string userIvec2 = userDir + "/train2.ivec.ark";
     ivectorExtraction.ReadIvector(userIvec2, trainIvector2);
+
+    string userPost1 = userDir + "/train1.post.ark";
+    ivectorExtraction.ReadPost(userPost1, trainPost1);
+    string userPost2 = userDir + "/train2.post.ark";
+    ivectorExtraction.ReadPost(userPost2, trainPost2);
+
     double score1 = ivectorExtraction.Score(testIvector, trainIvector1);
     double score2 = ivectorExtraction.Score(testIvector, trainIvector2);
     double baseScore = ivectorExtraction.Score(trainIvector1, trainIvector2);

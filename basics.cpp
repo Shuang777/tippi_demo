@@ -50,6 +50,10 @@ string prep_ivec_spec(string wavFile) {
     return ivecArk;
 }
 
+string prep_post_spec(string wavFile) {
+    string postArk = replace_str(wavFile, ".wav", ".post.ark");
+    return postArk;
+}
 
 void set_kaldi_env() {
     string path = getenv("PATH");
@@ -87,4 +91,7 @@ void move_files(string oriFile, string newFile) {
     string ivecArk = replace_str(oriFile, ".wav", ".ivec.ark");
     string newIevArk = replace_str(newFile, ".wav", ".ivec.ark");
     rename(ivecArk.c_str(), newIevArk.c_str());
+    string postArk = replace_str(oriFile, ".wav", ".post.ark");
+    string newPostArk = replace_str(newFile, ".wav", ".post.ark");
+    rename(postArk.c_str(), newPostArk.c_str());
 }

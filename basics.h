@@ -24,6 +24,8 @@ string prep_feat(string wavFile);
 
 string prep_ivec_spec(string wavFile);
 
+string prep_post_spec(string wavFile);
+
 void set_kaldi_env();
 
 void move_files(string oriFile, string newFile);

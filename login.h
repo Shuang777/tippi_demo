@@ -46,8 +46,6 @@ private:
 
     /// Directory for all the data/file
     string dataDir;
-    /// Subdirectory for wav files
-    string wavDir;
     /// Subdirectory for speaker files
     string fileDir;
 
@@ -56,6 +54,9 @@ private:
     string tmpDir;
 
     string newUsername;
+
+    // Tolerance for scoring against baseline
+    double tol;
 
     /// If the models are with derived variables
     const bool derived_in = true;

@@ -131,3 +131,7 @@ void IvectorExtraction::ReadIvector(string ivecFile, Vector<double> & ivector) {
     SequentialBaseFloatVectorReader ivector_reader("ark:"+ivecFile);
     ivector = (Vector<double>) ivector_reader.Value();
 }
+
+double IvectorExtraction::Score(const Vector<double> & ivec1, const Vector<double> & ivec2) {
+    return VecVec(ivec1, ivec2);
+}

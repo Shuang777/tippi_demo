@@ -15,6 +15,7 @@
 using std::pair;
 using std::endl;
 using std::ofstream;
+using std::max;
 
 login::login(QWidget *parent) :
     QMainWindow(parent),
@@ -34,10 +35,9 @@ login::login(QWidget *parent) :
     dataDir = "/home/shuang/project/tippi/final/demo/data";
     userInfoFile = dataDir + "/user_info";
 
-    wavDir = dataDir + "/wav";
     tmpDir = dataDir + "/tmp";
     fileDir = dataDir + "/files";
-    modelDir = dataDir + "/models";
+    modelDir = "/home/shuang/project/tippi/final/demo/models";
 
     testFile = tmpDir + "/test.wav";
     trainFile1 = tmpDir + "/train1.wav";
@@ -51,7 +51,6 @@ login::login(QWidget *parent) :
     ivectorExtraction.SetModels(femaleIvecMdl, femaleUbm, maleIvecMdl, maleUbm);
 
     mkdir(tmpDir.c_str(), S_IRWXU | S_IRWXG | S_IROTH | S_IXOTH);
-    mkdir(wavDir.c_str(), S_IRWXU | S_IRWXG | S_IROTH | S_IXOTH);
     mkdir(fileDir.c_str(), S_IRWXU | S_IRWXG | S_IROTH | S_IXOTH);
 
     milSeconds = 2500;
@@ -63,6 +62,8 @@ login::login(QWidget *parent) :
     SetCenterOfApplication();
 
     set_kaldi_env();
+
+    tol = 0.08;
 }
 
 void login::SetCenterOfApplication()
@@ -109,10 +110,10 @@ void login::on_loginButton_clicked() {
         QMessageBox::information(this, "Info", "Username not found.");
         return;
     }
-/*
+
     progressbar recordprogress(this, milSeconds, testFile);
     recordprogress.setModal(true);
-    recordprogress.exec();*/
+    recordprogress.exec();
 
     compute_feat("test", testFile);
     string feature_rspecifier = prep_feat(testFile);
@@ -134,7 +135,17 @@ bool login::Validate(std::string username) {
     ivectorExtraction.ReadIvector(userIvec1, trainIvector1);
     string userIvec2 = userDir + "/train2.ivec.ark";
     ivectorExtraction.ReadIvector(userIvec2, trainIvector2);
-    return true;
+    double score1 = ivectorExtraction.Score(testIvector, trainIvector1);
+    double score2 = ivectorExtraction.Score(testIvector, trainIvector2);
+    double baseScore = ivectorExtraction.Score(trainIvector1, trainIvector2);
+    qDebug() << "score against train1: " << score1;
+    qDebug() << "score against train2: " << score2;
+    qDebug() << "base score: " << baseScore;
+    qDebug() << "max / base: " << max(score1, score2) / baseScore;
+    if (max(score1, score2) > (1-tol) * baseScore)
+        return true;
+    else
+        return false;
 }
 
 void login::on_signupButton_clicked() {

@@ -117,10 +117,9 @@ void signup::Enroll(string username, Gender gender) {
 
 void signup::on_recordButton_clicked()
 {
-    /*
     progressbar recordprogress(this, milSeconds, trainFile1);
     recordprogress.setModal(true);
-    recordprogress.exec();*/
+    recordprogress.exec();
     if (CheckRecording(trainFile1)) {
         ui->checkBox->setChecked(true);
     } else {
@@ -131,10 +130,9 @@ void signup::on_recordButton_clicked()
 
 void signup::on_recordAgainButton_clicked()
 {
-    /*
     progressbar recordprogress(this, milSeconds, trainFile2);
     recordprogress.setModal(true);
-    recordprogress.exec();*/
+    recordprogress.exec();
     if (CheckRecording(trainFile2)) {
         ui->checkBox2->setChecked(true);
     } else {

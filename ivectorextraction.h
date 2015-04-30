@@ -18,6 +18,7 @@ public:
     void Extract(string feature_rspecifier, Vector<double> &ivector);
     static void WriteIvector(string ivecFile, string utt_id, const Vector<double> & ivector);
     static void ReadIvector(string ivecFile, Vector<double> & ivector);
+    static double Score(const Vector<double> & ivec1, const Vector<double> & ivec2);
 
 private:
     IvectorExtractor extractor;

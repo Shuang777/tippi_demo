@@ -111,7 +111,10 @@ void IvectorExtraction::ReadPost(string postFile, Posterior & post) {
 }
 
 double IvectorExtraction::Scoring(const Vector<double> & ivec1, const Vector<double> & ivec2) {
-    return VecVec(ivec1, ivec2);
+//    return VecVec(ivec1, ivec2);      // dot product
+    Vector<double> diff = ivec1;
+    diff.AddVec(-1, ivec2);
+    return diff.Norm(2);
 }
 
 double IvectorExtraction::Scoring(const Posterior & post1, const Posterior & post2) {

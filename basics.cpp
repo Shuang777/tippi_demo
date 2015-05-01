@@ -91,8 +91,8 @@ void move_files(string oriFile, string newFile) {
     string newVadArk = replace_str(newFile, ".wav", ".vad.ark");
     rename(vadArk.c_str(), newVadArk.c_str());
     string ivecArk = replace_str(oriFile, ".wav", ".ivec.ark");
-    string newIevArk = replace_str(newFile, ".wav", ".ivec.ark");
-    rename(ivecArk.c_str(), newIevArk.c_str());
+    string newIvecArk = replace_str(newFile, ".wav", ".ivec.ark");
+    rename(ivecArk.c_str(), newIvecArk.c_str());
     string postArk = replace_str(oriFile, ".wav", ".post.ark");
     string newPostArk = replace_str(newFile, ".wav", ".post.ark");
     rename(postArk.c_str(), newPostArk.c_str());
@@ -105,7 +105,7 @@ void check_and_copy_files(string wavFile, string newDir) {
     infile.open(newFile);
     while (infile.good()) {
         index++;
-        newFile = newDir + "/test_" + std::to_string(index) + ".wav";
+        newFile = newDir + "/recording_" + std::to_string(index) + ".wav";
         infile.close();
         infile.open(newFile);
     }
@@ -113,9 +113,14 @@ void check_and_copy_files(string wavFile, string newDir) {
 
     ifstream source(wavFile, ios::binary);
     ofstream dest(newFile, ios::binary);
-
     dest << source.rdbuf();
-
     source.close();
     dest.close();
+
+    string ivecArk = replace_str(wavFile, ".wav", ".ivec.ark");
+    string newIvecArk = replace_str(newFile, ".wav", ".ivec.ark");
+    rename(ivecArk.c_str(), newIvecArk.c_str());
+    string postArk = replace_str(wavFile, ".wav", ".post.ark");
+    string newPostArk = replace_str(newFile, ".wav", ".post.ark");
+    rename(postArk.c_str(), newPostArk.c_str());
 }

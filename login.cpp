@@ -16,6 +16,7 @@ using std::pair;
 using std::endl;
 using std::ofstream;
 using std::max;
+using std::min;
 
 login::login(QWidget *parent) :
     QMainWindow(parent),
@@ -65,7 +66,9 @@ login::login(QWidget *parent) :
 
     set_kaldi_env();
 
-    ivecScoreTol = 0.08;
+    //ivecScoreTol = 0.08;
+    ivecScoreTol = 0.3;
+    ivecDisThreshold = 20;
     postScoreTol = 0.20;
 
     skipRecording = false;
@@ -166,7 +169,7 @@ bool login::Validate(std::string username) {
     qDebug() << "score against train1: " << score1;
     qDebug() << "score against train2: " << score2;
     qDebug() << "base score: " << baseScore;
-    qDebug() << "max / base: " << max(score1, score2) / baseScore;
+    qDebug() << "min / base: " << min(score1, score2) / baseScore;
 
     double scorePost1 = ivectorExtraction.Scoring(testPost, trainPost1);
     double scorePost2 = ivectorExtraction.Scoring(testPost, trainPost2);
@@ -175,8 +178,9 @@ bool login::Validate(std::string username) {
     qDebug() << "scorePost1: " << scorePost1;
     qDebug() << "scorePost2: " << scorePost2;
     qDebug() << "baseScorePost: " << baseScorePost;
+    qDebug() << "max / base: " << max(scorePost1, scorePost2) / baseScorePost;
 
-    if ((max(score1, score2) > (1-ivecScoreTol) * baseScore) && (max(scorePost2, scorePost1) > (1 - postScoreTol) * baseScorePost))
+    if ((min(score1, score2) < ivecDisThreshold) && (max(scorePost2, scorePost1) > (1 - postScoreTol) * baseScorePost))
         return true;
     else
         return false;
@@ -184,7 +188,9 @@ bool login::Validate(std::string username) {
 
 void login::on_signupButton_clicked() {
     bool changePasswdMode = false;
-    signup signup_diag(this, milSeconds, &usernameMap, trainFile1, trainFile2, &ivectorExtraction, skipRecording, changePasswdMode);
+    signup signup_diag(this, milSeconds, &usernameMap, trainFile1, trainFile2,
+                       &ivectorExtraction, skipRecording,
+                       changePasswdMode, ivecDisThreshold);
     signup_diag.setModal(true);
     this->setVisible(false);
     newUsername = "";
@@ -201,7 +207,8 @@ void login::on_signupButton_clicked() {
 void login::on_changeButton_clicked()
 {
     bool changePasswdMode = true;
-    signup signup_diag(this, milSeconds, &usernameMap, trainFile1, trainFile2, &ivectorExtraction, skipRecording, changePasswdMode);        // change mode
+    signup signup_diag(this, milSeconds, &usernameMap, trainFile1, trainFile2,
+                       &ivectorExtraction, skipRecording, changePasswdMode, ivecDisThreshold);        // change mode
     signup_diag.setModal(true);
     this->setVisible(false);
     newUsername = "";

@@ -68,6 +68,7 @@ private:
     // Tolerance for scoring against baseline
     double ivecScoreTol;
     double postScoreTol;
+    double ivecDisThreshold;
 
     /// If the models are with derived variables
     const bool derived_in = true;

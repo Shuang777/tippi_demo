@@ -9,7 +9,7 @@ using std::pair;
 using std::ifstream;
 
 signup::signup(QWidget *parent, int milSeconds, UserMap *usernameMap, string trainFile1, string trainFile2,
-               IvectorExtraction *ivectorExtraction, bool skipRecording, bool changeMode) :
+               IvectorExtraction *ivectorExtraction, bool skipRecording, bool changeMode, double ivecDisThreshold) :
     QDialog(parent),
     ui(new Ui::signup),
     milSeconds(milSeconds),
@@ -18,7 +18,8 @@ signup::signup(QWidget *parent, int milSeconds, UserMap *usernameMap, string tra
     trainFile2(trainFile2),
     ivectorExtraction(ivectorExtraction),
     skipRecording(skipRecording),
-    changeMode(changeMode)
+    changeMode(changeMode),
+    ivecDisThreshold(ivecDisThreshold)
 {
     ui->setupUi(this);
 
@@ -100,14 +101,18 @@ void signup::on_doneButton_clicked()
         QMessageBox::information(this, "Info", "The 2nd passphrase recording not qualified.");
     }
 
-    Enroll(username, gender);
+    if (!Enroll(username, gender)) {
+        ui->checkBox->setChecked(false);
+        ui->checkBox2->setChecked(false);
+        return;
+    }
 
     emit SendUsername(username);
 
     close();
 }
 
-void signup::Enroll(string username, Gender gender) {
+bool signup::Enroll(string username, Gender gender) {
     ui->enrollBar->setValue(0);
     ui->enrollBar->show();
     ui->enrollBar->repaint();
@@ -123,7 +128,7 @@ void signup::Enroll(string username, Gender gender) {
     string ivecFile = prep_ivec_spec(trainFile1);
     ivectorExtraction->WriteIvector(ivecFile, utt_id, trainIvector1);
     string postFile = prep_post_spec(trainFile1);
-    ivectorExtraction->WritePost(postFile, utt_id, trainPost1);
+    ivectorExtraction->WritePost(postFile, utt_id, trainPost1);    
 
     emit EnrollProgress(50);
 
@@ -141,7 +146,18 @@ void signup::Enroll(string username, Gender gender) {
 
     emit EnrollProgress(100);
 
+    double score = ivectorExtraction->Scoring(trainIvector1, trainIvector2);
+
     ui->enrollBar->hide();
+
+    qDebug() << "score between training files: " << score;
+
+    if (score > ivecDisThreshold) {
+        QMessageBox::information(this, "Info", "Password does not match. Please record again.");
+        return false;
+    } else {
+        return true;
+    }
 }
 
 void signup::on_recordButton_clicked()

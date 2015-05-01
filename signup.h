@@ -16,7 +16,8 @@ class signup : public QDialog
 
 public:
     explicit signup(QWidget *parent, int milSeconds, UserMap *usernameMap, string trainFile1,
-                    string trainFile2, IvectorExtraction *ivectorExtraction, bool skipRecording, bool changeMode = false);
+                    string trainFile2, IvectorExtraction *ivectorExtraction, bool skipRecording,
+                    bool changeMode, double ivecDisThreshold);
     ~signup();
 
 private slots:
@@ -56,6 +57,8 @@ private:
     /// for debug usage
     bool skipRecording;
 
+    double ivecDisThreshold;
+
     int milSeconds;
     UserMap *usernameMap;
     string trainFile1;
@@ -66,7 +69,7 @@ private:
     bool CheckRecording(string trainFile);
 
     /// Enroll the user
-    void Enroll(string username, Gender gender);
+    bool Enroll(string username, Gender gender);
 
     /// if username pass the check
     bool PassNameCheck(string username);

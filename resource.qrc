@@ -1,0 +1,7 @@
+<RCC>
+    <qresource prefix="/images">
+        <file>chat.png</file>
+        <file>female.ico</file>
+        <file>male.ico</file>
+    </qresource>
+</RCC>

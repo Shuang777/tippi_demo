@@ -42,6 +42,7 @@ private slots:
 
 signals:
     void SendUsername(string username);
+    void EnrollProgress(int value);
 
 private:
     Ui::signup *ui;
@@ -69,6 +70,7 @@ private:
 
     /// if username pass the check
     bool PassNameCheck(string username);
+
 };
 
 #endif // SIGNUP_H

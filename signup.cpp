@@ -2,7 +2,11 @@
 #include "ui_signup.h"
 #include "progressbar.h"
 #include <QMessageBox>
+#include <fstream>
+#include <QStatusBar>
+#include <QtConcurrent>
 using std::pair;
+using std::ifstream;
 
 signup::signup(QWidget *parent, int milSeconds, UserMap *usernameMap, string trainFile1, string trainFile2,
                IvectorExtraction *ivectorExtraction, bool skipRecording, bool changeMode) :
@@ -22,13 +26,10 @@ signup::signup(QWidget *parent, int milSeconds, UserMap *usernameMap, string tra
     ui->checkBox2->setFixedSize(21,21);
     ui->checkBox3->setFixedSize(21,21);
 
-    male_ico = "/home/shuang/project/tippi/final/demo/male.ico";
-    female_ico = "/home/shuang/project/tippi/final/demo/female.ico";
-
-    QImage* img = new QImage(male_ico);
+    QImage* img = new QImage(":/images/male.ico");
     male_img = img->scaled(ui->logo->width(), ui->logo->height());
     delete img;
-    img = new QImage(female_ico);
+    img = new QImage(":/images/female.ico");
     female_img = img->scaled(ui->logo->width(), ui->logo->height());
     delete img;
 
@@ -39,6 +40,8 @@ signup::signup(QWidget *parent, int milSeconds, UserMap *usernameMap, string tra
     ui->checkBox2->setChecked(false);
     ui->checkBox3->setChecked(false);
 
+    ui->enrollBar->hide();
+    connect(this, SIGNAL(EnrollProgress(int)), ui->enrollBar, SLOT(setValue(int)));
 }
 
 signup::~signup()
@@ -78,6 +81,9 @@ void signup::on_doneButton_clicked()
     if (username == "") {
         QMessageBox::information(this, "Info", "Please input username.");
         return;
+    } else if (username == "super") {
+        QMessageBox::information(this, "Info", "Username super is reserved.");
+        return;
     } else if (!changeMode && usernameMap->find(username) != usernameMap->end()) {
         QMessageBox::information(this, "Info", "Username occupied. Please choose another.");
         return;
@@ -102,6 +108,10 @@ void signup::on_doneButton_clicked()
 }
 
 void signup::Enroll(string username, Gender gender) {
+    ui->enrollBar->setValue(0);
+    ui->enrollBar->show();
+    ui->enrollBar->repaint();
+
     usernameMap->insert(pair<string, Gender>(username,gender));
     string utt_id = username + "_1";
     compute_feat(utt_id, trainFile1);
@@ -109,10 +119,13 @@ void signup::Enroll(string username, Gender gender) {
     Vector<double> trainIvector1;
     Posterior trainPost1;
     ivectorExtraction->Extract(feature_rspecifier, trainIvector1, trainPost1);
+    emit EnrollProgress(30);
     string ivecFile = prep_ivec_spec(trainFile1);
     ivectorExtraction->WriteIvector(ivecFile, utt_id, trainIvector1);
     string postFile = prep_post_spec(trainFile1);
     ivectorExtraction->WritePost(postFile, utt_id, trainPost1);
+
+    emit EnrollProgress(50);
 
     utt_id = username + "_2";
     compute_feat(utt_id, trainFile2);
@@ -120,14 +133,23 @@ void signup::Enroll(string username, Gender gender) {
     Vector<double> trainIvector2;
     Posterior trainPost2;
     ivectorExtraction->Extract(feature_rspecifier, trainIvector2, trainPost2);
+    emit EnrollProgress(80);
     ivecFile = prep_ivec_spec(trainFile2);
     ivectorExtraction->WriteIvector(ivecFile, utt_id, trainIvector2);
     postFile = prep_post_spec(trainFile2);
     ivectorExtraction->WritePost(postFile, utt_id, trainPost2);
+
+    emit EnrollProgress(100);
+
+    ui->enrollBar->hide();
 }
 
 void signup::on_recordButton_clicked()
 {
+    if (ui->lineEdit->text() == "") {
+        QMessageBox::information(this, "Info", "Please input username.");
+        return;
+    }
     if (!skipRecording) {
         progressbar recordprogress(this, milSeconds, trainFile1);
         recordprogress.setModal(true);
@@ -143,6 +165,14 @@ void signup::on_recordButton_clicked()
 
 void signup::on_recordAgainButton_clicked()
 {
+    if (ui->lineEdit->text() == "") {
+        QMessageBox::information(this, "Info", "Please input username.");
+        return;
+    }
+    if (!ui->checkBox->isChecked()) {
+        QMessageBox::information(this, "Info", "Please press Record passphrase first.");
+        return;
+    }
     if (!skipRecording) {
         progressbar recordprogress(this, milSeconds, trainFile2);
         recordprogress.setModal(true);
@@ -156,20 +186,15 @@ void signup::on_recordAgainButton_clicked()
     ui->checkBox2->repaint();
 }
 
-bool signup::CheckRecording(string trainFile)
+bool signup::CheckRecording(string recordingFile)
 {
-    return true;
-}
-
-void signup::on_lineEdit_editingFinished()
-{
-    string username = ui->lineEdit->text().toStdString();
-    if (username != "" && PassNameCheck(username)) {
-        ui->checkBox3->setChecked(true);
+    ifstream is(recordingFile);
+    if (!is.good()) {
+        QMessageBox::information(this, "Info", "Recording not found, please record again.");
+        return false;
     } else {
-        ui->checkBox3->setChecked(false);
+        return true;
     }
-    ui->checkBox3->repaint();
 }
 
 bool signup::PassNameCheck(string username) {
@@ -178,6 +203,17 @@ bool signup::PassNameCheck(string username) {
     } else {
         return usernameMap->find(username) == usernameMap->end();
     }
+}
+
+void signup::on_lineEdit_editingFinished()
+{
+    string username = ui->lineEdit->text().toStdString();
+    if (username != "" && PassNameCheck(username) && username != "super") {
+        ui->checkBox3->setChecked(true);
+    } else {
+        ui->checkBox3->setChecked(false);
+    }
+    ui->checkBox3->repaint();
 }
 
 void signup::on_checkBox3_clicked()

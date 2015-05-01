@@ -163,7 +163,7 @@
     <rect>
      <x>60</x>
      <y>360</y>
-     <width>178</width>
+     <width>171</width>
      <height>29</height>
     </rect>
    </property>
@@ -171,7 +171,7 @@
     <item>
      <widget class="QPushButton" name="doneButton">
       <property name="text">
-       <string>Done</string>
+       <string>Enroll</string>
       </property>
      </widget>
     </item>
@@ -187,16 +187,23 @@
     </item>
    </layout>
   </widget>
+  <widget class="QProgressBar" name="enrollBar">
+   <property name="geometry">
+    <rect>
+     <x>60</x>
+     <y>400</y>
+     <width>171</width>
+     <height>23</height>
+    </rect>
+   </property>
+   <property name="value">
+    <number>24</number>
+   </property>
+  </widget>
   <zorder>layoutWidget</zorder>
   <zorder>layoutWidget</zorder>
   <zorder>logo</zorder>
-  <zorder>checkBox</zorder>
-  <zorder>recordButton</zorder>
-  <zorder>checkBox2</zorder>
-  <zorder>recordAgainButton</zorder>
-  <zorder>checkBox3</zorder>
-  <zorder>lineEdit</zorder>
-  <zorder>label</zorder>
+  <zorder>enrollBar</zorder>
  </widget>
  <tabstops>
   <tabstop>cancelButton</tabstop>

@@ -24,8 +24,7 @@ login::login(QWidget *parent) :
 {
     ui->setupUi(this);
 
-    QString filename = "/home/shuang/project/tippi/final/demo/chat.png";
-    QImage* img=new QImage(filename);
+    QImage* img=new QImage(":/images/chat.png");
     QImage imgScaled=img->scaled(ui->logo->width(), ui->logo->height());
     ui->logo->setPixmap(QPixmap::fromImage(imgScaled));
 
@@ -59,6 +58,8 @@ login::login(QWidget *parent) :
     LoadUserInfo();
 
     connect(ui->lineEdit, SIGNAL(returnPressed()),ui->loginButton,SLOT(click()));
+
+    ui->menuBar->hide();
 
     SetCenterOfApplication();
 
@@ -108,6 +109,11 @@ bool login::HasUser(string username) {
 
 void login::on_loginButton_clicked() {
     string username = ui->lineEdit->text().toStdString();
+    if (username == "super"){
+        ui->menuBar->show();
+        ui->lineEdit->setText("");
+        return;
+    }
     if (username == "") {
         QMessageBox::information(this, "Info", "Please input username first.");
         return;
@@ -181,12 +187,15 @@ void login::on_signupButton_clicked() {
     signup signup_diag(this, milSeconds, &usernameMap, trainFile1, trainFile2, &ivectorExtraction, skipRecording, changePasswdMode);
     signup_diag.setModal(true);
     this->setVisible(false);
+    newUsername = "";
     connect(&signup_diag, SIGNAL(SendUsername(string)), this, SLOT(SetNewUsername(string)));
     signup_diag.exec();
     ui->lineEdit->setText("");
     this->setVisible(true);
-    SaveNewUser(changePasswdMode);
-    UpdateUserInfo();
+    if (newUsername != "") {        // canceled
+        SaveNewUser(changePasswdMode);
+        UpdateUserInfo();
+    }
 }
 
 void login::on_changeButton_clicked()
@@ -195,12 +204,15 @@ void login::on_changeButton_clicked()
     signup signup_diag(this, milSeconds, &usernameMap, trainFile1, trainFile2, &ivectorExtraction, skipRecording, changePasswdMode);        // change mode
     signup_diag.setModal(true);
     this->setVisible(false);
+    newUsername = "";
     connect(&signup_diag, SIGNAL(SendUsername(string)), this, SLOT(SetNewUsername(string)));
     signup_diag.exec();
     ui->lineEdit->setText("");
     this->setVisible(true);
-    SaveNewUser(changePasswdMode);
-    UpdateUserInfo();
+    if (newUsername != "") {        // canceled
+        SaveNewUser(changePasswdMode);
+        UpdateUserInfo();
+    }
 }
 
 void login::SaveNewUser(bool changePasswdMode) {

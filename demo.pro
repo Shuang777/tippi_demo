@@ -4,7 +4,7 @@
 #
 #-------------------------------------------------
 
-QT       += core gui
+QT       += core gui concurrent
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
@@ -50,5 +50,8 @@ LIBS += /home/shuang/project/kaldi/trunk/src/ivector/kaldi-ivector.a \
         /home/shuang/project/kaldi/trunk/src/util/kaldi-util.a \
         /home/shuang/project/kaldi/trunk/src/base/kaldi-base.a
 LIBS += -lrt -lasound -lpthread -lm -lfst -llapack -lcblas /usr/lib/liblapack.so /usr/lib/libcblas.so /usr/lib/libatlas.so /usr/lib/libf77blas.so -ldl
+
+RESOURCES += \
+    resource.qrc
 
 

@@ -110,6 +110,24 @@ void IvectorExtraction::ReadPost(string postFile, Posterior & post) {
     post = posteriors_reader.Value();
 }
 
+double IvectorExtraction::FeatDistance(std::string feature_rspecifier1, std::string feature_rspecifier2)
+{
+    SequentialBaseFloatMatrixReader feature_reader1(feature_rspecifier1);
+    Matrix<BaseFloat> mat1 = feature_reader1.Value();
+    SequentialBaseFloatMatrixReader feature_reader2(feature_rspecifier2);
+    const Matrix<BaseFloat> &mat2 = feature_reader2.Value();
+    if (mat1.NumRows() < mat2.NumRows()) {
+        SubMatrix<BaseFloat> mat2sub(mat2, 0, mat1.NumRows(), 0, mat1.NumCols());
+        mat1.AddMat(-1.0, mat2sub);
+    } else if (mat1.NumRows() > mat2.NumRows()) {
+        mat1.Resize(mat2.NumRows(), mat2.NumCols(), kCopyData);
+        mat1.AddMat(-1, mat2);
+    } else {
+        mat1.AddMat(-1.0, mat2);
+    }
+    return mat1.FrobeniusNorm()/mat1.NumRows();
+}
+
 double IvectorExtraction::Scoring(const Vector<double> & ivec1, const Vector<double> & ivec2) {
 //    return VecVec(ivec1, ivec2);      // dot product
     Vector<double> diff = ivec1;
@@ -118,7 +136,7 @@ double IvectorExtraction::Scoring(const Vector<double> & ivec1, const Vector<dou
 }
 
 double IvectorExtraction::Scoring(const Posterior & post1, const Posterior & post2) {
-    double mismatchPenalty = -0.01;
+    double mismatchPenalty = 0;
     int numFrames1 = post1.size();
     int numFrames2 = post2.size();
     Matrix<double> bestPath (numFrames1, numFrames2);
@@ -134,7 +152,7 @@ double IvectorExtraction::Scoring(const Posterior & post1, const Posterior & pos
             double path1Score = bestPath(i,j-1) + mismatchPenalty;  // horizontal path
             double path2Score = bestPath(i-1,j) + mismatchPenalty;  // vertical path
             double path3Score = bestPath(i-1,j-1);                  // diagnoal path
-            double bestScore = max(max(path1Score, path2Score), path3Score);
+            double bestScore = LogAdd(LogAdd(path1Score, path2Score), path3Score);
             bestPath(i,j) = bestScore + Distance(post1[i],post2[j]);
         }
     }
@@ -142,7 +160,7 @@ double IvectorExtraction::Scoring(const Posterior & post1, const Posterior & pos
 }
 
 double IvectorExtraction::Distance(const vector<pair<int,float> > &post1, const vector<pair<int,float> > &post2) {
-    int firstN = 5;
+    int firstN = 20;
     double score = 0;
     for (int i = 0; i < firstN && i < post1.size(); i++) {
         for (int j = 0; j < firstN && j < post2.size(); j++) {
@@ -150,5 +168,8 @@ double IvectorExtraction::Distance(const vector<pair<int,float> > &post1, const 
                 score += post1[i].second * post2[j].second;
         }
     }
-    return score;
+    if (score == 0)
+        return kMinLogDiffDouble;
+    else
+        return std::log(score);
 }

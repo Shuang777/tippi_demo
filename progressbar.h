@@ -34,7 +34,6 @@ private:
 
     void RecordAndWrite();
 
-
 };
 
 #endif // PROGRESSBAR_H

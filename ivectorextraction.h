@@ -22,6 +22,7 @@ public:
     static void WritePost(string postFile, string utt_id, const Posterior & post);
     static void ReadIvector(string ivecFile, Vector<double> & ivector);
     static void ReadPost(string postFile, Posterior &post);
+    static double FeatDistance(string feature_rspecifier1, string feature_rspecifier2);
     static double Scoring(const Vector<double> & ivec1, const Vector<double> & ivec2);
     static double Scoring(const Posterior & post1, const Posterior & post2);
 

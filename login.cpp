@@ -68,8 +68,8 @@ login::login(QWidget *parent) :
 
     //ivecScoreTol = 0.08;
     ivecScoreTol = 0.3;
-    ivecDisThreshold = 20;
-    postScoreTol = 0.20;
+    ivecDisThreshold = 22;
+    postScoreTol = 0.30;
 
     skipRecording = false;
     saveWavFile = false;
@@ -136,10 +136,16 @@ void login::on_loginButton_clicked() {
         }
     }
 
-    compute_feat("test", testFile);
+    string utt_id = "test";
+    compute_feat(utt_id, testFile);
     string feature_rspecifier = prep_feat(testFile);
     ivectorExtraction.SetGender(usernameMap[username]);
     ivectorExtraction.Extract(feature_rspecifier, testIvector, testPost);
+
+    string ivecFile = prep_ivec_spec(testFile);
+    ivectorExtraction.WriteIvector(ivecFile, utt_id, testIvector);
+    string postFile = prep_post_spec(testFile);
+    ivectorExtraction.WritePost(postFile, utt_id, testPost);
 
     bool checkPassed = Validate(username);     // validate if the recored wav file match user's info
 
@@ -169,7 +175,7 @@ bool login::Validate(std::string username) {
     qDebug() << "score against train1: " << score1;
     qDebug() << "score against train2: " << score2;
     qDebug() << "base score: " << baseScore;
-    qDebug() << "min / base: " << min(score1, score2) / baseScore;
+    qDebug() << "min: " << min(score1, score2) << " vs threshold " << ivecDisThreshold;
 
     double scorePost1 = ivectorExtraction.Scoring(testPost, trainPost1);
     double scorePost2 = ivectorExtraction.Scoring(testPost, trainPost2);
@@ -178,9 +184,9 @@ bool login::Validate(std::string username) {
     qDebug() << "scorePost1: " << scorePost1;
     qDebug() << "scorePost2: " << scorePost2;
     qDebug() << "baseScorePost: " << baseScorePost;
-    qDebug() << "max / base: " << max(scorePost1, scorePost2) / baseScorePost;
+    qDebug() << "max / base: " << max(scorePost1, scorePost2) / baseScorePost << " vs threshold" << postScoreTol + 1;
 
-    if ((min(score1, score2) < ivecDisThreshold) && (max(scorePost2, scorePost1) > (1 - postScoreTol) * baseScorePost))
+    if ((min(score1, score2) < ivecDisThreshold) && (max(scorePost2, scorePost1) > (1 + postScoreTol) * baseScorePost))
         return true;
     else
         return false;
@@ -188,27 +194,19 @@ bool login::Validate(std::string username) {
 
 void login::on_signupButton_clicked() {
     bool changePasswdMode = false;
-    signup signup_diag(this, milSeconds, &usernameMap, trainFile1, trainFile2,
-                       &ivectorExtraction, skipRecording,
-                       changePasswdMode, ivecDisThreshold);
-    signup_diag.setModal(true);
-    this->setVisible(false);
-    newUsername = "";
-    connect(&signup_diag, SIGNAL(SendUsername(string)), this, SLOT(SetNewUsername(string)));
-    signup_diag.exec();
-    ui->lineEdit->setText("");
-    this->setVisible(true);
-    if (newUsername != "") {        // canceled
-        SaveNewUser(changePasswdMode);
-        UpdateUserInfo();
-    }
+    OpenSignupDiag(changePasswdMode);
 }
 
 void login::on_changeButton_clicked()
 {
     bool changePasswdMode = true;
+    OpenSignupDiag(changePasswdMode);
+}
+
+void login::OpenSignupDiag(bool changePasswdMode) {
     signup signup_diag(this, milSeconds, &usernameMap, trainFile1, trainFile2,
-                       &ivectorExtraction, skipRecording, changePasswdMode, ivecDisThreshold);        // change mode
+                       &ivectorExtraction, skipRecording,
+                       changePasswdMode, ivecDisThreshold);
     signup_diag.setModal(true);
     this->setVisible(false);
     newUsername = "";
@@ -253,7 +251,6 @@ void login::on_lineEdit_returnPressed()
 {
 
 }
-
 
 void login::on_actionSave_wave_files_triggered()
 {

@@ -82,6 +82,8 @@ private:
 
     void LoadUserInfo();
 
+    void OpenSignupDiag(bool changePasswdMode);
+
     /// Validate if the recorded testfile name the username
     bool Validate(string username);
 

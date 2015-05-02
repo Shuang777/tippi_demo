@@ -34,6 +34,9 @@ signup::signup(QWidget *parent, int milSeconds, UserMap *usernameMap, string tra
     female_img = img->scaled(ui->logo->width(), ui->logo->height());
     delete img;
 
+    silFile = "/home/shuang/project/tippi/final/demo/data/files/silence.wav";
+    featDisThreshold = 2.85;
+
     ui->logo->setPixmap(QPixmap::fromImage(male_img));
     ui->radioButtonMale->setChecked(true);
 
@@ -117,36 +120,50 @@ bool signup::Enroll(string username, Gender gender) {
     ui->enrollBar->show();
     ui->enrollBar->repaint();
 
+    string utt_id1 = username + "_1";
+    compute_feat(utt_id1, trainFile1);
+    string feature_rspecifier1 = prep_feat(trainFile1);
+
+    string utt_id2 = username + "_2";
+    compute_feat(utt_id2, trainFile2);
+    string feature_rspecifier2 = prep_feat(trainFile2);
+
+    string feature_rspecifier_sil = prep_feat(silFile);
+    double featDist1 = IvectorExtraction::FeatDistance(feature_rspecifier1, feature_rspecifier_sil);
+    double featDist2 = IvectorExtraction::FeatDistance(feature_rspecifier2, feature_rspecifier_sil);
+
+    qDebug() << "distance between training file1 and silence: " << featDist1;
+    qDebug() << "distance between training file2 and silence: " << featDist2;
+
+    if (featDist1 < featDisThreshold || featDist2 < featDisThreshold) {
+        QMessageBox::information(this, "Info", "Password does not meet requirement (speak more phrases or louder)");
+        return false;
+    }
+
+    emit EnrollProgress(20);
+
     usernameMap->insert(pair<string, Gender>(username,gender));
-    string utt_id = username + "_1";
-    compute_feat(utt_id, trainFile1);
-    string feature_rspecifier = prep_feat(trainFile1);
+
     Vector<double> trainIvector1;
     Posterior trainPost1;
-    ivectorExtraction->Extract(feature_rspecifier, trainIvector1, trainPost1);
-    emit EnrollProgress(30);
+    ivectorExtraction->Extract(feature_rspecifier1, trainIvector1, trainPost1);
     string ivecFile = prep_ivec_spec(trainFile1);
-    ivectorExtraction->WriteIvector(ivecFile, utt_id, trainIvector1);
+    ivectorExtraction->WriteIvector(ivecFile, utt_id1, trainIvector1);
     string postFile = prep_post_spec(trainFile1);
-    ivectorExtraction->WritePost(postFile, utt_id, trainPost1);    
+    ivectorExtraction->WritePost(postFile, utt_id1, trainPost1);
 
-    emit EnrollProgress(50);
+    emit EnrollProgress(60);
 
-    utt_id = username + "_2";
-    compute_feat(utt_id, trainFile2);
-    feature_rspecifier = prep_feat(trainFile2);
     Vector<double> trainIvector2;
     Posterior trainPost2;
-    ivectorExtraction->Extract(feature_rspecifier, trainIvector2, trainPost2);
-    emit EnrollProgress(80);
+    ivectorExtraction->Extract(feature_rspecifier2, trainIvector2, trainPost2);
     ivecFile = prep_ivec_spec(trainFile2);
-    ivectorExtraction->WriteIvector(ivecFile, utt_id, trainIvector2);
+    ivectorExtraction->WriteIvector(ivecFile, utt_id2, trainIvector2);
     postFile = prep_post_spec(trainFile2);
-    ivectorExtraction->WritePost(postFile, utt_id, trainPost2);
-
+    ivectorExtraction->WritePost(postFile, utt_id2, trainPost2);
     emit EnrollProgress(100);
 
-    double score = ivectorExtraction->Scoring(trainIvector1, trainIvector2);
+    double score = IvectorExtraction::Scoring(trainIvector1, trainIvector2);
 
     ui->enrollBar->hide();
 

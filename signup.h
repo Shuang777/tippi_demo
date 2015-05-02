@@ -63,6 +63,11 @@ private:
     UserMap *usernameMap;
     string trainFile1;
     string trainFile2;
+
+    string silFile;
+
+    double featDisThreshold;
+
     IvectorExtraction *ivectorExtraction;
 
     /// Check if the recorded wav file meets criteria (e.g. speech length)
